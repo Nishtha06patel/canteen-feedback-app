@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api', // Will be proxied by Vite locally, or use direct URL in production
+    baseURL: import.meta.env.VITE_API_URL || '/api', // Use /api to match the explicit namespace backend uses
 });
 
 api.interceptors.request.use((config) => {

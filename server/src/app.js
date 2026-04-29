@@ -17,10 +17,10 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
-app.use('/feedback', feedbackRoutes);
-app.use('/menu', menuRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/menu', menuRoutes);
 
 // Base route for API
 app.get('/api', (req, res) => {
