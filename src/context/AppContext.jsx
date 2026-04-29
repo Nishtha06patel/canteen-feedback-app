@@ -73,7 +73,8 @@ export const AppProvider = ({ children }) => {
             setCurrentUser({ role: data.role, username: data.email, id: data.id });
             return true;
         } catch (error) {
-            throw new Error(error.response?.data?.message || 'Registration failed');
+            console.error("Registration error:", error);
+            throw new Error(error.response?.data?.message || error.message || 'Registration failed');
         }
     };
 
@@ -84,7 +85,8 @@ export const AppProvider = ({ children }) => {
             setCurrentUser({ role: data.role, username: data.email, id: data.id });
             return true;
         } catch (error) {
-            throw new Error(error.response?.data?.message || 'Login failed');
+            console.error("Login error:", error);
+            throw new Error(error.response?.data?.message || error.message || 'Login failed');
         }
     };
 
