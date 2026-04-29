@@ -119,7 +119,7 @@ const AdminUsers = () => {
                     
                     <form onSubmit={handleAddUser} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mail size={14}/> Student Email ID</label>
+                            <label style={{ marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mail size={14}/> Student Email ID</label>
                             <input 
                                 type="email"
                                 value={newEmail}
@@ -130,7 +130,7 @@ const AdminUsers = () => {
                             />
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Lock size={14}/> Initial Password</label>
+                            <label style={{ marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Lock size={14}/> Initial Password</label>
                             <input 
                                 type="password"
                                 value={newPassword}
