@@ -103,16 +103,21 @@ const UserDashboard = () => {
             }
         }
 
-        addFeedback(
-            targetItemName,
-            texts[mealId],
-            ratings[mealId],
-            mealTitleMap[mealId],
-            'Overall',
-            '',
-            targetPhotoId
-        );
-        showToast(`Thanks! Your feedback for ${targetItemName.length > 50 ? 'these items' : targetItemName} was submitted.`, 'success');
+        try {
+            await addFeedback(
+                targetItemName,
+                texts[mealId],
+                ratings[mealId],
+                mealTitleMap[mealId],
+                'Overall',
+                '',
+                targetPhotoId
+            );
+            showToast(`Thanks! Your feedback for ${targetItemName.length > 50 ? 'these items' : targetItemName} was submitted.`, 'success');
+        } catch (error) {
+            showToast(error.message || 'Failed to submit feedback', 'error');
+            return;
+        }
         setTexts(prev => ({ ...prev, [mealId]: '' }));
         setRatings(prev => ({ ...prev, [mealId]: 0 }));
         setSelectedItems(prev => ({ ...prev, [mealId]: '' }));

@@ -10,11 +10,11 @@ const AdminLogin = () => {
     const { loginAdmin } = useAppContext();
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
         try {
-            loginAdmin(email, password);
+            await loginAdmin(email, password);
             navigate('/admin/dashboard');
         } catch (err) {
             setError(err.message);

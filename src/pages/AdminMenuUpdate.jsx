@@ -173,7 +173,7 @@ const AdminMenuUpdate = () => {
         setEditingBlock(block.id);
     };
 
-    const handleSave = (block) => {
+    const handleSave = async (block) => {
         let newItemsArray = [];
         
         if (block.isCombo) {
@@ -220,8 +220,12 @@ const AdminMenuUpdate = () => {
             });
         }
 
-        updateMenuForDate(dateStr, block.id, newItemsArray);
-        setEditingBlock(null);
+        try {
+            await updateMenuForDate(dateStr, block.id, newItemsArray);
+            setEditingBlock(null);
+        } catch (error) {
+            alert(error.message || 'Failed to save menu.');
+        }
     };
 
     return (

@@ -41,7 +41,7 @@ const Signup = () => {
         setStep(3);
     };
 
-    const handleFinalSignup = (e) => {
+    const handleFinalSignup = async (e) => {
         e.preventDefault();
         setError('');
         if (password.length < 6) {
@@ -49,7 +49,7 @@ const Signup = () => {
             return;
         }
         try {
-            registerUser(email, password);
+            await registerUser(email, password);
             setToastMessage('Password saved Successful');
             setTimeout(() => {
                 navigate('/login');

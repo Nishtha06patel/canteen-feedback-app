@@ -149,7 +149,7 @@ export const processMenuUpload = async (file, updateMenuFunction) => {
     for (const [dateStr, blocks] of Object.entries(parsedPayload)) {
         for (const [blockId, items] of Object.entries(blocks)) {
             // Clean up combo subitems if necessary
-            updateMenuFunction(dateStr, blockId, items);
+            await updateMenuFunction(dateStr, blockId, items);
         }
         daysUpdated++;
     }
