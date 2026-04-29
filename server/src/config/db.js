@@ -19,10 +19,31 @@ const poolConfig = process.env.DATABASE_URL
 
 const pool = new Pool(poolConfig);
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 pool.on('error', (err, client) => {
     console.error('Unexpected error on idle client', err);
     process.exit(-1);
 });
+
+// Auto-run schema.sql on startup
+const initDatabase = async () => {
+    try {
+        const schemaPath = path.join(__dirname, '../../schema.sql');
+        const schema = fs.readFileSync(schemaPath, 'utf8');
+        await pool.query(schema);
+        console.log('Database schema successfully initialized/verified.');
+    } catch (err) {
+        console.error('Failed to initialize database schema:', err);
+    }
+};
+
+initDatabase();
 
 export const query = (text, params) => pool.query(text, params);
 export default pool;
