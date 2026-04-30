@@ -12,10 +12,10 @@ const AdminUsers = () => {
     const [successMsg, setSuccessMsg] = useState('');
 
     const getUserStats = (email) => {
-        const userFeedbacks = feedbacks.filter(fb => fb.username === email);
+        const userFeedbacks = feedbacks.filter(fb => fb.user_email === email);
         return {
             count: userFeedbacks.length,
-            lastDate: userFeedbacks.length > 0 ? userFeedbacks[0].timestamp : null // assuming feedbacks are unshifted (newest first)
+            lastDate: userFeedbacks.length > 0 ? userFeedbacks[0].created_at : null // assuming feedbacks are unshifted (newest first)
         };
     };
 
