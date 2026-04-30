@@ -21,7 +21,7 @@ export const AppProvider = ({ children }) => {
 
     // Fallbacks for UI components using legacy arrays not yet supported by backend
     const [registeredUsers, setRegisteredUsers] = useState([]);
-    const [admins] = useState([]);
+    const [admins, setAdmins] = useState([]);
 
     useEffect(() => {
         localStorage.setItem('canteen_currentUser', JSON.stringify(currentUser));
@@ -44,10 +44,15 @@ export const AppProvider = ({ children }) => {
 
     const fetchUsers = async () => {
         try {
-            const { data } = await api.get('/users');
-            setRegisteredUsers(data);
+            const { data: usersData } = await api.get('/users');
+            setRegisteredUsers(usersData);
+            
+            if (currentUser && currentUser.role === 'admin') {
+                const { data: adminsData } = await api.get('/users/admins');
+                setAdmins(adminsData);
+            }
         } catch (error) {
-            console.error("Failed to fetch users", error);
+            console.error("Failed to fetch users or admins", error);
         }
     };
 
@@ -170,8 +175,25 @@ export const AppProvider = ({ children }) => {
         }
     };
     
-    const addAdminAccount = () => true;
-    const deleteAdminEmail = () => true;
+    const addAdminAccount = async (email, password) => {
+        try {
+            await api.post('/users/admins', { email, password });
+            await fetchUsers();
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to add admin');
+        }
+    };
+
+    const deleteAdminEmail = async (email) => {
+        try {
+            await api.delete(`/users/admins/${email}`);
+            await fetchUsers();
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to delete admin');
+        }
+    };
     
     const resetPassword = async (email, newPassword) => {
         try {
