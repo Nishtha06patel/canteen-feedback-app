@@ -1,34 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { getPhotoRecord } from '../utils/db';
-
-const FeedbackPhotoRenderer = ({ photoId }) => {
-    const [imgSrc, setImgSrc] = useState(null);
-    useEffect(() => {
-        getPhotoRecord(photoId).then(record => {
-            if (record && record.base64) setImgSrc(record.base64);
-        }).catch(err => console.error(err));
-    }, [photoId]);
-    
-    if (!imgSrc) return <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic', padding: '0.5rem 0' }}>Resolving Photographic Evidence Vault...</div>;
-    
-    return (
-        <div style={{ display: 'inline-flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
-            <img src={imgSrc} style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', border: '1px solid var(--glass-border)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} alt='Feedback Upload' />
-            <div>
-                <a 
-                    href={imgSrc} 
-                    download={`Evidence_${photoId}.jpg`} 
-                    className="btn btn-outline hover-grow" 
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', padding: '0.4rem 0.8rem', textDecoration: 'none', color: 'var(--text-main)', borderColor: 'var(--glass-border)', borderRadius: '6px' }}
-                >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Download Image
-                </a>
-            </div>
-        </div>
-    );
-};
 
 const AdminDashboard = () => {
     const { feedbacks, registeredUsers } = useAppContext();
@@ -36,8 +7,26 @@ const AdminDashboard = () => {
 
     const filters = ['All Feedback', 'Morning Snack', 'Lunch', 'Evening Snack', 'Dinner', 'Full Day', 'Facility'];
 
-    // Filter out orphaned feedbacks from deleted users
-    const validFeedbacks = feedbacks.filter(fb => registeredUsers.some(u => u.email === fb.username) || fb.username === 'Anonymous');
+    // Filter out orphaned feedbacks from deleted users and parse JSON messages
+    const mappedFeedbacks = feedbacks.map(fb => {
+        let details = {};
+        try {
+            details = JSON.parse(fb.message);
+        } catch (e) {
+            details = { text: fb.message };
+        }
+        return {
+            id: fb.id,
+            username: fb.user_email,
+            timestamp: fb.created_at,
+            mealType: details.mealType || 'Unknown',
+            starRating: details.stars || 0,
+            feedbackText: details.text || (details.text === '' ? '' : fb.message),
+            photoId: details.photoId || null
+        };
+    });
+
+    const validFeedbacks = mappedFeedbacks.filter(fb => registeredUsers.some(u => u.email === fb.username) || fb.username === 'Anonymous');
 
     const filteredFeedbacks = validFeedbacks.filter(fb => {
         if (filter === 'All Feedback') return true;
@@ -96,15 +85,8 @@ const AdminDashboard = () => {
 
         for (const fb of filteredFeedbacks) {
             let imageMarkup = 'No';
-            if (fb.photoId) {
-                try {
-                    const record = await getPhotoRecord(fb.photoId);
-                    if (record && record.base64) {
-                        imageMarkup = `<img src="${record.base64}" style="max-width: 120px; max-height: 120px; border-radius: 6px; border: 1px solid #ddd; display: block;" alt="Evidence" />`;
-                    }
-                } catch (e) {
-                    console.error('Failed to attach internal image layout mapping', e);
-                }
+            if (fb.photoBase64) {
+                imageMarkup = `<img src="${fb.photoBase64}" style="max-width: 120px; max-height: 120px; border-radius: 6px; border: 1px solid #ddd; display: block;" alt="Evidence" />`;
             } else if (fb.photoName) {
                 imageMarkup = `<span style="font-size:11px; font-style:italic;">Legacy File:<br/>${fb.photoName}</span>`;
             }
@@ -179,10 +161,15 @@ const AdminDashboard = () => {
                                 </p>
                                 <p><span style={{ fontWeight: 'bold' }}>Feedback: </span> {fb.feedbackText || 'None'}</p>
                                 
-                                {(fb.photoId || fb.photoName) && (
+                                {(fb.photoBase64 || fb.photoName) && (
                                     <div style={{ marginTop: '0.75rem' }}>
-                                        {fb.photoId ? (
-                                            <FeedbackPhotoRenderer photoId={fb.photoId} />
+                                        {fb.photoBase64 ? (
+                                            <div style={{ display: 'inline-flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
+                                                <img src={fb.photoBase64} style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', border: '1px solid var(--glass-border)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} alt='Feedback Upload' />
+                                                <div>
+                                                    <a href={fb.photoBase64} download={`Evidence_${fb.id}.jpg`} className="btn btn-outline hover-grow" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', padding: '0.4rem 0.8rem', textDecoration: 'none', color: 'var(--text-main)', borderColor: 'var(--glass-border)', borderRadius: '6px' }}>Download Image</a>
+                                                </div>
+                                            </div>
                                         ) : (
                                             <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>[Legacy System File: {fb.photoName}]</span>
                                         )}

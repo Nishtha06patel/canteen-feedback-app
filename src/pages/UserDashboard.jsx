@@ -90,12 +90,10 @@ const UserDashboard = () => {
             }
         }
 
-        let targetPhotoId = null;
+        let base64Data = null;
         if (photos[mealId]) {
             try {
-                const base64Data = await fileToBase64(photos[mealId]);
-                targetPhotoId = `photo_${Date.now()}`;
-                await savePhotoRecord({ id: targetPhotoId, base64: base64Data, filename: photos[mealId].name, timestamp: Date.now() });
+                base64Data = await fileToBase64(photos[mealId]);
             } catch (error) {
                 console.error(error);
                 showToast('Failed to securely encode photo upload for storage.', 'error');
@@ -111,7 +109,7 @@ const UserDashboard = () => {
                 mealTitleMap[mealId],
                 'Overall',
                 '',
-                targetPhotoId
+                base64Data
             );
             showToast(`Thanks! Your feedback for ${targetItemName.length > 50 ? 'these items' : targetItemName} was submitted.`, 'success');
         } catch (error) {

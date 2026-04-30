@@ -110,10 +110,10 @@ export const AppProvider = ({ children }) => {
         setCurrentUser(null);
     };
 
-    const addFeedback = async (mealItem, text, stars, mealType, type, selectedItemsList, photoId) => {
+    const addFeedback = async (mealItem, text, stars, mealType, type, selectedItemsList, photoBase64) => {
         try {
             const payload = {
-                message: `[${mealType}] ${mealItem} - ${stars} Stars: ${text}`
+                message: JSON.stringify({ mealItem, text, stars, mealType, type, photoBase64 })
             };
             await api.post('/feedback', payload);
             return true;
