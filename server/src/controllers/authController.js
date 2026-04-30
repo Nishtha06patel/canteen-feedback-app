@@ -3,7 +3,8 @@ import jwt from 'jsonwebtoken';
 import { query } from '../config/db.js';
 
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+    const secret = process.env.JWT_SECRET || 'fallback_super_secret_key_change_in_production';
+    return jwt.sign({ id }, secret, {
         expiresIn: '30d',
     });
 };
@@ -84,5 +85,30 @@ export const login = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error during login' });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        if (!email || !newPassword) {
+            return res.status(400).json({ message: 'Please provide email and new password' });
+        }
+
+        const userExists = await query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+        if (userExists.rows.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await query('UPDATE users SET password_hash = $1 WHERE email = $2', [hashedPassword, email.toLowerCase()]);
+
+        res.json({ message: 'Password reset successful' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error during password reset' });
     }
 };

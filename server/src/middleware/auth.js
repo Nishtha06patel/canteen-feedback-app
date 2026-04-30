@@ -17,7 +17,8 @@ export const verifyToken = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const secret = process.env.JWT_SECRET || 'fallback_super_secret_key_change_in_production';
+        const decoded = jwt.verify(token, secret);
         
         // Fetch user from database
         const result = await query('SELECT id, email, role FROM users WHERE id = $1', [decoded.id]);

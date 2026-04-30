@@ -39,7 +39,7 @@ const AdminLogin = () => {
                             type="email"
                             placeholder="admin@iar.ac.in"
                             value={email}
-                            onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                            onChange={(e) => { setEmail(e.target.value.trim()); setError(''); }}
                             className="input-field"
                             required
                         />

@@ -26,11 +26,7 @@ const AdminForgotPassword = () => {
             return;
         }
 
-        const adminUser = admins.find(u => u.email === lower);
-        if (!adminUser) {
-            setError('This email is not registered in the administrative database.');
-            return;
-        }
+        // removed legacy local array check
         const newOtp = generateOtp();
         setMockOtp(newOtp);
         setToastMessage(`[MOCK EMAIL] Security Alert: Your Admin password reset OTP is: ${newOtp}`);
@@ -48,7 +44,7 @@ const AdminForgotPassword = () => {
         setStep(3);
     };
 
-    const handleSetNewPassword = (e) => {
+    const handleSetNewPassword = async (e) => {
         e.preventDefault();
         setError('');
         if (password.length < 6) {
@@ -56,7 +52,7 @@ const AdminForgotPassword = () => {
             return;
         }
         try {
-            resetAdminPassword(email, password);
+            await resetAdminPassword(email, password);
             setToastMessage('Admin Password updated securely.');
             setTimeout(() => {
                 navigate('/admin/login');
@@ -79,9 +75,8 @@ const AdminForgotPassword = () => {
                         </div>
                         <h1 style={{ marginBottom: '0.5rem', fontSize: '1.75rem' }}>Forgot Password</h1>
                         <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Enter your registered email ID.</p>
-                        
                         <div style={{ textAlign: 'left' }}>
-                            <input type="email" value={email} onChange={(e) => { setEmail(e.target.value.toLowerCase()); setError(''); }} placeholder="admin@iar.ac.in" className="input-field" required />
+                            <input type="email" value={email} onChange={(e) => { setEmail(e.target.value.toLowerCase().trim()); setError(''); }} placeholder="admin@iar.ac.in" className="input-field" required />
                         </div>
                         {error && <p style={{ color: 'var(--danger)', fontSize: '0.875rem', marginTop: '0.5rem' }}>{error}</p>}
                         <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Find Account & Send OTP</button>

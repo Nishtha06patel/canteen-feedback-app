@@ -153,8 +153,19 @@ export const AppProvider = ({ children }) => {
     const deleteUser = () => true;
     const addAdminAccount = () => true;
     const deleteAdminEmail = () => true;
-    const resetPassword = () => true;
-    const resetAdminPassword = () => true;
+    
+    const resetPassword = async (email, newPassword) => {
+        try {
+            await api.post('/auth/reset-password', { email, newPassword });
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to reset password');
+        }
+    };
+    
+    const resetAdminPassword = async (email, newPassword) => {
+        return await resetPassword(email, newPassword);
+    };
 
     return (
         <AppContext.Provider value={{ 

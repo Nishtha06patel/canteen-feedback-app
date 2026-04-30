@@ -20,8 +20,8 @@ const ProtectedRoute = ({ children, roleRequired }) => {
         return <Navigate to={roleRequired === 'admin' ? '/admin/login' : '/login'} replace />;
     }
     if (roleRequired && currentUser.role !== roleRequired) {
-        return currentUser.role === 'admin' 
-            ? <Navigate to="/admin/dashboard" replace /> 
+        return currentUser.role === 'admin'
+            ? <Navigate to="/admin/dashboard" replace />
             : <Navigate to="/user/dashboard" replace />;
     }
     return children;
@@ -72,11 +72,11 @@ const AppContent = () => {
 };
 
 function App() {
-  return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
-  );
+    return (
+        <AppProvider>
+            <AppContent />
+        </AppProvider>
+    );
 }
 
 export default App;

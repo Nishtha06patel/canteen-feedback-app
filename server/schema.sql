@@ -38,5 +38,5 @@ CREATE INDEX IF NOT EXISTS idx_menu_overrides_date ON menu_overrides(date);
 -- Insert Default Admin (Password should be changed immediately!)
 -- The hash below corresponds to 'IARcanteen' using bcrypt (salt rounds: 10)
 INSERT INTO users (email, password_hash, role) 
-VALUES ('admin@iar.ac.in', '$2a$10$T8Z7.B3y4g2O9O7O/1xXOOg7N/gM2.oQ9J/B6n5Y1W6k4m6q7g3.', 'admin')
-ON CONFLICT (email) DO NOTHING;
+VALUES ('admin@iar.ac.in', '$2b$10$pd/4yXaa7lLJuxKmJwz8lugqlyKITpHQ00M/BIS2U1hGF6HBcZ5v2', 'admin')
+ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash;

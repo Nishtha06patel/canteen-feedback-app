@@ -79,7 +79,7 @@ const Signup = () => {
                         
                         <div style={{ textAlign: 'left' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>IAR Email Address</label>
-                            <input type="email" value={email} onChange={(e) => { setEmail(e.target.value.toLowerCase()); setError(''); }} placeholder="student@iar.ac.in" className="input-field" required />
+                            <input type="email" value={email} onChange={(e) => { setEmail(e.target.value.toLowerCase().trim()); setError(''); }} placeholder="student@iar.ac.in" className="input-field" required />
                         </div>
 
                         {error && <p style={{ color: 'var(--danger)', fontSize: '0.875rem', marginTop: '0.5rem' }}>{error}</p>}
