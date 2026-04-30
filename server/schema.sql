@@ -1,11 +1,13 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Define Enum for roles to ensure strict values
-CREATE TYPE user_role AS ENUM ('user', 'admin');
+DO $$ BEGIN
+    CREATE TYPE user_role AS ENUM ('user', 'admin');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Users Table
 CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role user_role DEFAULT 'user',
@@ -14,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Feedbacks Table
 CREATE TABLE IF NOT EXISTS feedbacks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -22,7 +24,7 @@ CREATE TABLE IF NOT EXISTS feedbacks (
 
 -- Menu Overrides Table
 CREATE TABLE IF NOT EXISTS menu_overrides (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     date DATE UNIQUE NOT NULL,
     items JSONB NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

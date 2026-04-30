@@ -19,7 +19,7 @@ export const addMenuOverride = async (req, res) => {
         }
 
         const result = await query(
-            'INSERT INTO menu_overrides (date, items) VALUES ($1, $2) RETURNING id, date, items, created_at',
+            'INSERT INTO menu_overrides (date, items) VALUES ($1, $2) ON CONFLICT (date) DO UPDATE SET items = EXCLUDED.items RETURNING id, date, items, created_at',
             [date, JSON.stringify(items)]
         );
 
