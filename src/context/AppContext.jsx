@@ -20,9 +20,8 @@ export const AppProvider = ({ children }) => {
     });
 
     // Fallbacks for UI components using legacy arrays not yet supported by backend
-    const [registeredUsers] = useState([]);
+    const [registeredUsers, setRegisteredUsers] = useState([]);
     const [admins] = useState([]);
-
 
     useEffect(() => {
         localStorage.setItem('canteen_currentUser', JSON.stringify(currentUser));
@@ -35,10 +34,22 @@ export const AppProvider = ({ children }) => {
         if (currentUser) {
             fetchFeedbacks();
             fetchMenus();
+            if (currentUser.role === 'admin') {
+                fetchUsers();
+            }
         }
     }, [currentUser]);
 
     const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+    const fetchUsers = async () => {
+        try {
+            const { data } = await api.get('/users');
+            setRegisteredUsers(data);
+        } catch (error) {
+            console.error("Failed to fetch users", error);
+        }
+    };
 
     const fetchFeedbacks = async () => {
         if (currentUser?.role !== 'admin') return;
@@ -149,8 +160,16 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // Dummy functions for legacy components
-    const deleteUser = () => true;
+    const deleteUser = async (email) => {
+        try {
+            await api.delete(`/users/${email}`);
+            await fetchUsers(); // Refresh the list
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to delete user');
+        }
+    };
+    
     const addAdminAccount = () => true;
     const deleteAdminEmail = () => true;
     

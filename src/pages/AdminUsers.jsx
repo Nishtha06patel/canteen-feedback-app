@@ -25,17 +25,25 @@ const AdminUsers = () => {
         }
     };
 
-    const handleAddUser = (e) => {
+    const handleAddUser = async (e) => {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
         try {
-            registerUser(newEmail, newPassword);
+            // Using API directly to avoid registerUser's setCurrentUser which logs the admin out
+            const { default: api } = await import('../utils/api');
+            await api.post('/auth/register', { email: newEmail, password: newPassword });
+            
+            // Re-fetch users through a workaround or context if exported
+            // Assuming we just need to refresh the page or we can add fetchUsers to context later
+            // For now, let's just trigger a reload or rely on a context function if we export it
+            window.location.reload(); 
+            
             setSuccessMsg(`Successfully registered ${newEmail}`);
             setNewEmail('');
             setNewPassword('');
         } catch (err) {
-            setError(err.message || 'Failed to add user.');
+            setError(err.response?.data?.message || err.message || 'Failed to add user.');
         }
     };
 
