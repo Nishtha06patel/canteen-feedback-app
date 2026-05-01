@@ -15,9 +15,10 @@ const AdminDashboard = () => {
         try {
             details = JSON.parse(fb.message);
         } catch (e) {
-            details = { text: fb.message };
+            const messageStr = fb.message || '';
+            details = { text: messageStr };
             // Try to parse legacy string format like "[Breakfast] Samosa - 3 Stars: not good"
-            const match = fb.message.match(/\[(.*?)\] .*? - (\d+) Stars?:?\s*(.*)/);
+            const match = messageStr.match(/\[(.*?)\] .*? - (\d+) Stars?:?\s*(.*)/);
             if (match) {
                 details.mealType = match[1];
                 details.stars = parseInt(match[2], 10);
@@ -27,7 +28,8 @@ const AdminDashboard = () => {
 
         // Mock status based on ID to keep it consistent
         const statuses = ['Resolved', 'Pending', 'Open'];
-        const status = statuses[fb.id % 3];
+        const statusIndex = fb.id ? fb.id.toString().charCodeAt(0) % 3 : 0;
+        const status = statuses[statusIndex] || 'Open';
 
         return {
             id: fb.id,
