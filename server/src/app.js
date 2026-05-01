@@ -3,14 +3,29 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
+
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import menuRoutes from './routes/menuRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 
 dotenv.config();
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*", // Adjust in production
+        methods: ["GET", "POST"]
+    }
+});
+
+// Store io in global for access in controllers
+global.io = io;
 
 // Middleware
 app.use(cors());
@@ -21,6 +36,30 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/menu', menuRoutes);
+app.use('/api/messages', messageRoutes);
+
+// Socket.io Connection & Auth
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token || socket.handshake.query.token;
+    if (!token) return next(new Error('Authentication error'));
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) return next(new Error('Authentication error'));
+        socket.user = decoded;
+        next();
+    });
+});
+
+io.on('connection', (socket) => {
+    console.log(`User connected: ${socket.user.email} (${socket.user.role})`);
+    
+    // Join role-based room
+    socket.join(socket.user.role);
+    
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.user.email}`);
+    });
+});
 
 // Base route for API
 app.get('/api', (req, res) => {
@@ -46,6 +85,6 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

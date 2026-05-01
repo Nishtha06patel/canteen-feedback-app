@@ -82,10 +82,21 @@ CREATE TABLE IF NOT EXISTS menu_overrides (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Messages Table (Announcements)
+CREATE TABLE IF NOT EXISTS messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sender_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    recipient_role VARCHAR(20) NOT NULL, -- 'staff' or 'student'
+    content TEXT NOT NULL,
+    type VARCHAR(20) DEFAULT 'normal', -- 'normal', 'delay', 'emergency'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Performance Indexes
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_feedbacks_user_id ON feedbacks(user_id);
 CREATE INDEX IF NOT EXISTS idx_menu_overrides_date ON menu_overrides(date);
+CREATE INDEX IF NOT EXISTS idx_messages_recipient ON messages(recipient_role);
 
 -- Insert Default Admin (Password should be changed immediately!)
 -- The hash below corresponds to 'IARcanteen' using bcrypt (salt rounds: 10)

@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import AdminAnalytics from './pages/AdminAnalytics';
 import AdminMenuUpdate from './pages/AdminMenuUpdate';
+import BroadcastMessages from './pages/BroadcastMessages';
 import AppAdmin from './pages/AppAdmin';
 import StaffDashboard from './pages/StaffDashboard';
 import NavBar from './components/NavBar';
@@ -72,6 +73,11 @@ const AppContent = () => {
                             <Route path="/admin/analytics" element={
                                 <ProtectedRoute allowedRoles={['admin', 'staff']}>
                                     <AdminAnalytics />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/admin/broadcast" element={
+                                <ProtectedRoute allowedRoles={['admin', 'staff']}>
+                                    <BroadcastMessages />
                                 </ProtectedRoute>
                             } />
                             <Route path="/admin/users" element={

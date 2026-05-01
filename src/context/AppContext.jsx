@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '../utils/api';
+import { io } from 'socket.io-client';
 import { MENU_DATA, DAYS_OF_WEEK } from '../mockData';
 import { format } from 'date-fns';
 
@@ -22,6 +23,8 @@ export const AppProvider = ({ children }) => {
     // Fallbacks for UI components using legacy arrays not yet supported by backend
     const [registeredUsers, setRegisteredUsers] = useState([]);
     const [admins, setAdmins] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [socket, setSocket] = useState(null);
     const [feedbackStats, setFeedbackStats] = useState(null);
 
     useEffect(() => {
@@ -39,6 +42,27 @@ export const AppProvider = ({ children }) => {
             if (currentUser.role === 'admin' || currentUser.role === 'staff') {
                 fetchUsers();
             }
+
+            // Socket.io initialization
+            const token = localStorage.getItem('token');
+            const newSocket = io(window.location.origin, {
+                auth: { token }
+            });
+
+            newSocket.on('newMessage', (msg) => {
+                setMessages(prev => [msg, ...prev]);
+                // Highlight or sound alert if needed
+                if (msg.type === 'emergency') {
+                    // Alert logic
+                }
+            });
+
+            setSocket(newSocket);
+            fetchMessages();
+
+            return () => {
+                newSocket.disconnect();
+            };
         }
 
         // Response interceptor to handle blocked users or expired tokens
@@ -142,6 +166,30 @@ export const AppProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('canteen_token');
         setCurrentUser(null);
+    };
+
+    const fetchMessages = async () => {
+        if (!currentUser) return;
+        try {
+            const { data } = await api.get('/messages');
+            setMessages(data);
+        } catch (error) {
+            console.error("Failed to fetch messages", error);
+        }
+    };
+
+    const sendBroadcastMessage = async (content, type, recipientRole) => {
+        try {
+            const { data } = await api.post('/messages', { content, type, recipient_role: recipientRole });
+            // The socket emission is handled by backend, but we might want to update local state if we are the sender
+            // But usually the backend emits to the sender's room too if they belong to it, or we manually add it.
+            // In our case, admin sends to staff, so admin won't see it in their "student" or "staff" room.
+            // So we add it manually to our list.
+            setMessages(prev => [data, ...prev]);
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to send message');
+        }
     };
 
     const addFeedback = async (mealItem, text, stars, mealType, type, selectedItemsList, photoBase64) => {
@@ -282,7 +330,8 @@ export const AppProvider = ({ children }) => {
             currentUser, feedbacks, theme, menuOverrides, registeredUsers, admins, feedbackStats,
             toggleTheme, registerUser, loginUser, loginAdmin, logout, addFeedback, updateFeedbackStatus,
             getMenuForDate, updateMenuForDate, addUser, deleteUser, blockUser, unblockUser, addAdminAccount, deleteAdminEmail,
-            resetPassword, resetAdminPassword, fetchStats
+            resetPassword, resetAdminPassword, fetchStats,
+            messages, sendBroadcastMessage, fetchMessages
         }}>
             {children}
         </AppContext.Provider>

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { DAYS_OF_WEEK } from '../mockData';
 import { useAppContext } from '../context/AppContext';
 import { format, startOfWeek, addDays } from 'date-fns';
-import { Camera, Paperclip, X, Image as ImageIcon, Utensils, Sun, Moon, ArrowLeft, Star, Clock } from 'lucide-react';
+import { Camera, Paperclip, X, Image as ImageIcon, Utensils, Sun, Moon, ArrowLeft, Star, Clock, Bell, AlertTriangle } from 'lucide-react';
 import { fileToBase64 } from '../utils/db';
 
 const UserDashboard = () => {
-    const { addFeedback, getMenuForDate } = useAppContext();
+    const { addFeedback, getMenuForDate, messages } = useAppContext();
     const [selectedDay, setSelectedDay] = useState('');
     const [currentDay, setCurrentDay] = useState('');
     const [expandedBlock, setExpandedBlock] = useState(null);
@@ -294,6 +294,44 @@ const UserDashboard = () => {
                 </span>
                 {displayDateStr}
             </div>
+
+            {/* Announcements Section */}
+            {messages.length > 0 && (
+                <div style={{ marginBottom: '2.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700' }}>
+                        <Bell size={20} color="var(--primary)" /> Recent Announcements
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
+                        {messages.map(msg => (
+                            <div key={msg.id} className="glass-card" style={{ 
+                                minWidth: '300px', 
+                                maxWidth: '300px', 
+                                padding: '1.25rem', 
+                                borderLeft: `4px solid ${msg.type === 'emergency' ? '#ef4444' : msg.type === 'delay' ? '#f59e0b' : 'var(--primary)'}`,
+                                position: 'relative',
+                                background: msg.type === 'emergency' ? 'rgba(239, 68, 68, 0.03)' : 'var(--bg-card)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', alignItems: 'center' }}>
+                                    <span style={{ 
+                                        fontSize: '0.7rem', 
+                                        fontWeight: '800', 
+                                        textTransform: 'uppercase', 
+                                        color: msg.type === 'emergency' ? '#ef4444' : msg.type === 'delay' ? '#f59e0b' : 'var(--primary)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.3rem'
+                                    }}>
+                                        {msg.type === 'emergency' ? <AlertTriangle size={12} /> : msg.type === 'delay' ? <Clock size={12} /> : <Bell size={12} />}
+                                        {msg.type}
+                                    </span>
+                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{format(new Date(msg.created_at), 'hh:mm a')}</span>
+                                </div>
+                                <p style={{ fontSize: '0.875rem', margin: 0, color: 'var(--text-main)', lineHeight: '1.5', fontWeight: '500' }}>{msg.content}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Top Day Selector Navbar (Styled as clean pills) */}
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
