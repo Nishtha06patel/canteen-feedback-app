@@ -26,8 +26,17 @@ export const register = async (req, res) => {
             return res.status(400).json({ message: 'Invalid role provided' });
         }
 
-        // Admin Secret Code Validation
+        // Restrict Admin registration to a maximum limit
         if (role === 'admin') {
+            const MAX_ADMINS = 2;
+            const adminCountResult = await query('SELECT COUNT(*) FROM users WHERE role = $1', ['admin']);
+            const adminCount = parseInt(adminCountResult.rows[0].count);
+            
+            if (adminCount >= MAX_ADMINS) {
+                return res.status(403).json({ message: 'Admin limit reached. No more admin accounts can be created.' });
+            }
+
+            // Admin Secret Code Validation
             const expectedCode = process.env.ADMIN_SECRET_CODE || 'IAR-ADMIN-2026';
             if (secretCode !== expectedCode) {
                 return res.status(403).json({ message: 'Invalid Admin Secret Code' });
@@ -145,5 +154,18 @@ export const resetPassword = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error during password reset' });
+    }
+};
+
+export const getAdminCount = async (req, res) => {
+    try {
+        const result = await query('SELECT COUNT(*) FROM users WHERE role = $1', ['admin']);
+        res.json({ 
+            count: parseInt(result.rows[0].count),
+            maxAdmins: 2
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 };

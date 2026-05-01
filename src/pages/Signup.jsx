@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { UserPlus, Eye, EyeOff, GraduationCap, Shield, User, Mail, Lock } from 'lucide-react';
@@ -20,6 +20,21 @@ const Signup = () => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [adminLimitReached, setAdminLimitReached] = useState(false);
+
+    useEffect(() => {
+        const checkAdminLimit = async () => {
+            try {
+                const { data } = await api.get('/auth/admin-count');
+                if (data.count >= data.maxAdmins) {
+                    setAdminLimitReached(true);
+                }
+            } catch (error) {
+                console.error("Failed to check admin limit", error);
+            }
+        };
+        checkAdminLimit();
+    }, []);
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -179,7 +194,9 @@ const Signup = () => {
                             >
                                 <option value="" disabled>Select your role</option>
                                 <option value="user">Student</option>
-                                <option value="admin">Admin</option>
+                                <option value="admin" disabled={adminLimitReached}>
+                                    Admin {adminLimitReached ? '(Limit Reached)' : ''}
+                                </option>
                             </select>
                             <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none', display: 'flex' }}>
                                 <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
