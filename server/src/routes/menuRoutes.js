@@ -1,6 +1,6 @@
 import express from 'express';
 import { getMenu, addMenuOverride, updateMenuOverride } from '../controllers/menuController.js';
-import { verifyToken, requireAdmin } from '../middleware/auth.js';
+import { verifyToken, requireAdmin, requireStaffOrAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
