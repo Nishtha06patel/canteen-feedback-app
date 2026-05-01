@@ -10,11 +10,17 @@ const AppAdmin = () => {
     const [newPassword, setNewPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleAddAdmin = (e) => {
+    const handleAddAdmin = async (e) => {
         e.preventDefault();
         setError('');
+        
+        if (admins.length >= 2) {
+            setError('Admin limit reached. Only 2 admins are allowed.');
+            return;
+        }
+
         try {
-            addAdminAccount(newEmail, newPassword);
+            await addAdminAccount(newEmail, newPassword);
             setNewEmail('');
             setNewPassword('');
         } catch (err) {
@@ -22,15 +28,17 @@ const AppAdmin = () => {
         }
     };
 
-    const handleDelete = (email) => {
+    const handleDelete = async (email) => {
         if (window.confirm(`WARNING: Are you sure you want to revoke admin powers for ${email}?`)) {
             try {
-                deleteAdminEmail(email);
+                await deleteAdminEmail(email);
             } catch (err) {
                 alert(err.message || 'Failed to delete admin.');
             }
         }
     };
+
+    const isLimitReached = admins.length >= 2;
 
     return (
         <div className="animate-fade-in" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
@@ -108,6 +116,7 @@ const AppAdmin = () => {
                                 className="input-field"
                                 placeholder="new.admin@iar.ac.in"
                                 required
+                                disabled={isLimitReached}
                             />
                         </div>
                         <div>
@@ -119,16 +128,38 @@ const AppAdmin = () => {
                                 className="input-field"
                                 placeholder="Enter secure password..."
                                 required
+                                disabled={isLimitReached}
                             />
                         </div>
 
-                        {error && (
-                            <div style={{ padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', borderRadius: '8px', color: 'var(--danger)', fontSize: '0.85rem', fontWeight: '600' }}>
-                                {error}
+                        {(error || isLimitReached) && (
+                            <div style={{ 
+                                padding: '0.75rem', 
+                                background: isLimitReached && !error ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)', 
+                                border: `1px solid ${isLimitReached && !error ? 'var(--warning)' : 'var(--danger)'}`, 
+                                borderRadius: '8px', 
+                                color: isLimitReached && !error ? 'var(--warning)' : 'var(--danger)', 
+                                fontSize: '0.85rem', 
+                                fontWeight: '600' 
+                            }}>
+                                {error || "Maximum admin limit reached (2). Remove an admin to add a new one."}
                             </div>
                         )}
 
-                        <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center', width: '100%', padding: '0.8rem' }}>
+                        <button 
+                            type="submit" 
+                            className="btn btn-primary" 
+                            style={{ 
+                                marginTop: '0.5rem', 
+                                display: 'flex', 
+                                justifyContent: 'center', 
+                                width: '100%', 
+                                padding: '0.8rem',
+                                opacity: isLimitReached ? 0.5 : 1,
+                                cursor: isLimitReached ? 'not-allowed' : 'pointer'
+                            }}
+                            disabled={isLimitReached}
+                        >
                             Authorize Account
                         </button>
                     </form>

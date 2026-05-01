@@ -56,6 +56,16 @@ export const addAdmin = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const { query } = await import('../config/db.js');
+
+        // Restrict Admin creation to a maximum limit
+        const MAX_ADMINS = 2;
+        const adminCountResult = await query('SELECT COUNT(*) FROM users WHERE role = $1', ['admin']);
+        const adminCount = parseInt(adminCountResult.rows[0].count);
+        
+        if (adminCount >= MAX_ADMINS) {
+            return res.status(403).json({ message: 'Admin limit reached. Only 2 admins are allowed in the system.' });
+        }
+
         await query(
             'INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3)',
             [email.toLowerCase(), hashedPassword, 'admin']
