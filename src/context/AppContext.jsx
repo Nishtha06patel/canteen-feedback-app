@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
     // Fallbacks for UI components using legacy arrays not yet supported by backend
     const [registeredUsers, setRegisteredUsers] = useState([]);
     const [admins, setAdmins] = useState([]);
+    const [feedbackStats, setFeedbackStats] = useState(null);
 
     useEffect(() => {
         localStorage.setItem('canteen_currentUser', JSON.stringify(currentUser));
@@ -34,6 +35,7 @@ export const AppProvider = ({ children }) => {
         if (currentUser) {
             fetchFeedbacks();
             fetchMenus();
+            fetchStats();
             if (currentUser.role === 'admin' || currentUser.role === 'staff') {
                 fetchUsers();
             }
@@ -80,6 +82,16 @@ export const AppProvider = ({ children }) => {
             setFeedbacks(data);
         } catch (error) {
             console.error("Failed to fetch feedbacks", error);
+        }
+    };
+
+    const fetchStats = async () => {
+        if (currentUser?.role !== 'admin' && currentUser?.role !== 'staff') return;
+        try {
+            const { data } = await api.get('/feedback/stats');
+            setFeedbackStats(data);
+        } catch (error) {
+            console.error("Failed to fetch feedback stats", error);
         }
     };
 
@@ -267,10 +279,10 @@ export const AppProvider = ({ children }) => {
 
     return (
         <AppContext.Provider value={{ 
-            currentUser, feedbacks, theme, menuOverrides, registeredUsers, admins,
+            currentUser, feedbacks, theme, menuOverrides, registeredUsers, admins, feedbackStats,
             toggleTheme, registerUser, loginUser, loginAdmin, logout, addFeedback, updateFeedbackStatus,
             getMenuForDate, updateMenuForDate, addUser, deleteUser, blockUser, unblockUser, addAdminAccount, deleteAdminEmail,
-            resetPassword, resetAdminPassword
+            resetPassword, resetAdminPassword, fetchStats
         }}>
             {children}
         </AppContext.Provider>

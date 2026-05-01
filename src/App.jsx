@@ -10,6 +10,7 @@ import AdminForgotPassword from './pages/AdminForgotPassword';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
+import AdminAnalytics from './pages/AdminAnalytics';
 import AdminMenuUpdate from './pages/AdminMenuUpdate';
 import AppAdmin from './pages/AppAdmin';
 import StaffDashboard from './pages/StaffDashboard';
@@ -66,6 +67,11 @@ const AppContent = () => {
                             <Route path="/admin/dashboard" element={
                                 <ProtectedRoute allowedRoles={['admin', 'staff']}>
                                     <AdminDashboard />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/admin/analytics" element={
+                                <ProtectedRoute allowedRoles={['admin', 'staff']}>
+                                    <AdminAnalytics />
                                 </ProtectedRoute>
                             } />
                             <Route path="/admin/users" element={

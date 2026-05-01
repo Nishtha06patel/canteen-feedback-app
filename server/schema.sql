@@ -53,11 +53,24 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Safely add status column to existing feedbacks table if it doesn't exist
+-- Safely add status and analytics columns to existing feedbacks table if they don't exist
 DO $$ 
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'feedbacks' AND column_name = 'status') THEN
         ALTER TABLE feedbacks ADD COLUMN status VARCHAR(20) DEFAULT 'Open';
+    END IF;
+
+    -- Add Analytics columns
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'feedbacks' AND column_name = 'rating') THEN
+        ALTER TABLE feedbacks ADD COLUMN rating INTEGER;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'feedbacks' AND column_name = 'feedback_type') THEN
+        ALTER TABLE feedbacks ADD COLUMN feedback_type VARCHAR(20);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'feedbacks' AND column_name = 'item_name') THEN
+        ALTER TABLE feedbacks ADD COLUMN item_name VARCHAR(255);
     END IF;
 END $$;
 

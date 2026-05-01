@@ -20,6 +20,7 @@ const UserDashboard = () => {
     const [ratings, setRatings] = useState(initialRatings);
     const [texts, setTexts] = useState(initialTexts);
     const [selectedItems, setSelectedItems] = useState(initialSelectedItems);
+    const [feedbackTypes, setFeedbackTypes] = useState({ breakfast: 'suggestion', lunch: 'suggestion', evening_snack: 'suggestion', dinner: 'suggestion', full_day: 'suggestion', cleanliness: 'suggestion', washroom: 'suggestion', hand_wash: 'suggestion' });
     const [photos, setPhotos] = useState(initialPhotos);
 
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -107,7 +108,7 @@ const UserDashboard = () => {
                 texts[mealId],
                 ratings[mealId],
                 mealTitleMap[mealId],
-                'Overall',
+                feedbackTypes[mealId],
                 '',
                 base64Data
             );
@@ -167,6 +168,33 @@ const UserDashboard = () => {
                                 </select>
                             </div>
                         )}
+
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '500' }}>
+                            What type of feedback is this?
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', width: '100%' }}>
+                            {['suggestion', 'praise', 'complaint'].map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => setFeedbackTypes(prev => ({ ...prev, [block.id]: t }))}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.5rem',
+                                        borderRadius: '8px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '600',
+                                        textTransform: 'capitalize',
+                                        cursor: 'pointer',
+                                        border: `1px solid ${feedbackTypes[block.id] === t ? 'var(--primary)' : 'var(--border-light)'}`,
+                                        background: feedbackTypes[block.id] === t ? 'var(--primary)' : 'white',
+                                        color: feedbackTypes[block.id] === t ? 'white' : 'var(--text-muted)',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
 
                         <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '500' }}>
                             How would you rate this?
