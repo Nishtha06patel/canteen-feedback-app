@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { DAYS_OF_WEEK } from '../mockData';
 import { useAppContext } from '../context/AppContext';
 import { format, startOfWeek, addDays } from 'date-fns';
-import { Camera, Paperclip, X, Image } from 'lucide-react';
-import { fileToBase64, savePhotoRecord } from '../utils/db';
+import { Camera, Paperclip, X, Image as ImageIcon, Utensils, Sun, Moon, ArrowLeft, Star } from 'lucide-react';
+import { fileToBase64 } from '../utils/db';
 
 const UserDashboard = () => {
     const { addFeedback, getMenuForDate } = useAppContext();
@@ -16,13 +16,11 @@ const UserDashboard = () => {
     const initialTexts = { breakfast: '', lunch: '', evening_snack: '', dinner: '', full_day: '', cleanliness: '', washroom: '', hand_wash: '' };
     const initialSelectedItems = { breakfast: '', lunch: '', evening_snack: '', dinner: '', full_day: '', cleanliness: '', washroom: '', hand_wash: '' };
     const initialPhotos = { breakfast: null, lunch: null, evening_snack: null, dinner: null, full_day: null, cleanliness: null, washroom: null, hand_wash: null };
-    const initialShowPhotoOptions = { breakfast: false, lunch: false, evening_snack: false, dinner: false, full_day: false, cleanliness: false, washroom: false, hand_wash: false };
 
     const [ratings, setRatings] = useState(initialRatings);
     const [texts, setTexts] = useState(initialTexts);
     const [selectedItems, setSelectedItems] = useState(initialSelectedItems);
     const [photos, setPhotos] = useState(initialPhotos);
-    const [showPhotoOptions, setShowPhotoOptions] = useState(initialShowPhotoOptions);
 
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
     const showToast = (message, type = 'success') => {
@@ -32,9 +30,10 @@ const UserDashboard = () => {
 
     useEffect(() => {
         const today = new Date();
-        const currentDayStr = DAYS_OF_WEEK[today.getDay()];
-        setSelectedDay(currentDayStr);
-        setCurrentDay(currentDayStr);
+        const currentDayStr = DAYS_OF_WEEK[today.getDay() === 0 ? 6 : today.getDay() - 1]; // Adjustment if needed
+        const actualDayStr = DAYS_OF_WEEK[today.getDay()];
+        setSelectedDay(actualDayStr);
+        setCurrentDay(actualDayStr);
     }, []);
 
     const getDateForDayName = (dayName) => {
@@ -47,17 +46,18 @@ const UserDashboard = () => {
 
     const targetDateObj = getDateForDayName(selectedDay);
     const dateStrForSelected = format(targetDateObj, 'yyyy-MM-dd');
+    const displayDateStr = format(targetDateObj, 'EEEE, d MMMM yyyy');
     const currentMenuData = selectedDay ? getMenuForDate(dateStrForSelected) : {};
 
     const MEAL_BLOCKS = [
-        { id: 'breakfast', title: 'Morning Snack', time: '8AM-10AM', unlockHour: 0 },
-        { id: 'lunch', title: 'Lunch', time: '12PM-2:30PM', unlockHour: 12 },
-        { id: 'evening_snack', title: 'Evening Snack', time: '4PM-6PM', unlockHour: 16 },
-        { id: 'dinner', title: 'Dinner', time: '7PM-10PM', unlockHour: 19 },
-        { id: 'full_day', title: 'Full Day', time: '10AM-5PM', unlockHour: 10 },
-        { id: 'cleanliness', title: 'Cleanliness of Canteen', time: 'Facility', unlockHour: 0, isFacility: true },
-        { id: 'washroom', title: 'Washroom', time: 'Facility', unlockHour: 0, isFacility: true },
-        { id: 'hand_wash', title: 'Hand Wash Area', time: 'Facility', unlockHour: 0, isFacility: true }
+        { id: 'breakfast', title: 'Morning Snack', time: '8:00 AM - 10:00 AM', unlockHour: 8, icon: <Sun size={20} color="#f59e0b" /> },
+        { id: 'lunch', title: 'Lunch', time: '12:00 PM - 2:30 PM', unlockHour: 12, icon: <Utensils size={20} color="#64748b" /> },
+        { id: 'evening_snack', title: 'Evening Snack', time: '4:00 PM - 6:00 PM', unlockHour: 16, icon: <Moon size={20} color="#64748b" /> },
+        { id: 'dinner', title: 'Dinner', time: '7:00 PM - 10:00 PM', unlockHour: 19, icon: <Moon size={20} color="#334155" /> },
+        { id: 'full_day', title: 'Full Day', time: '10:00 AM - 5:00 PM', unlockHour: 10, icon: <Utensils size={20} color="#64748b" /> },
+        { id: 'cleanliness', title: 'Cleanliness of Canteen', time: 'Facility', unlockHour: 0, isFacility: true, icon: <Utensils size={20} color="#10b981" /> },
+        { id: 'washroom', title: 'Washroom', time: 'Facility', unlockHour: 0, isFacility: true, icon: <Utensils size={20} color="#10b981" /> },
+        { id: 'hand_wash', title: 'Hand Wash Area', time: 'Facility', unlockHour: 0, isFacility: true, icon: <Utensils size={20} color="#10b981" /> }
     ];
 
     const handleCardSubmit = async (mealId) => {
@@ -111,7 +111,7 @@ const UserDashboard = () => {
                 '',
                 base64Data
             );
-            showToast(`Thanks! Your feedback for ${targetItemName.length > 50 ? 'these items' : targetItemName} was submitted.`, 'success');
+            showToast(`Feedback submitted successfully!`, 'success');
         } catch (error) {
             showToast(error.message || 'Failed to submit feedback', 'error');
             return;
@@ -120,308 +120,284 @@ const UserDashboard = () => {
         setRatings(prev => ({ ...prev, [mealId]: 0 }));
         setSelectedItems(prev => ({ ...prev, [mealId]: '' }));
         setPhotos(prev => ({ ...prev, [mealId]: null }));
-        setShowPhotoOptions(prev => ({ ...prev, [mealId]: false }));
-        setExpandedBlock(null); // Close the form after submission
+        setExpandedBlock(null); 
     };
 
     
     const renderModal = () => {
         if (!expandedBlock) return null;
         const block = MEAL_BLOCKS.find(b => b.id === expandedBlock);
-                if (!block) return null;
-                const isFacility = block.isFacility;
-                const rawItems = isFacility ? [] : (currentMenuData[block.id] || []);
-                
-                return (
-                    <div className="feedback-modal-wrapper">
-                        <div className="feedback-modal animate-pop-in">
-
-                             {/* Right Content Column */}
-                             <div className="feedback-modal-content" style={{ position: 'relative' }}>
-
-
-
-                                  <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', paddingRight: '0.5rem' }}>
-                                      {/* Back button */}
-                                      <button onClick={() => { setExpandedBlock(null); }} className="back-btn" style={{ marginBottom: '1.5rem', marginTop: '0.5rem' }}>
-                                          <span style={{ fontSize: '1.2rem' }}>←</span> BACK
-                                      </button>
-
-                                      <h2 style={{ fontSize: '1.25rem', fontWeight: '900', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                          {block.title}
-                                      </h2>
-                                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.4, marginBottom: '2rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                          LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISICING ELIT. WE APPRECIATE YOUR FEEDBACK!
-                                          <br/>
-                                          <strong style={{ color: 'var(--highlight-cyan)' }}>{isFacility ? 'FACILITY RATING' : 'MEAL EXPERIENCE'}</strong>
-                                      </p>
-
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                                          {/* Item Selector Dropdown */}
-                                      {!isFacility && (
-                                          <select
-                                              className="input-field"
-                                              value={selectedItems[block.id] || ''}
-                                              onChange={(e) => setSelectedItems(prev => ({ ...prev, [block.id]: e.target.value }))}
-                                          >
-                                              {(block.id === 'lunch' || block.id === 'dinner') ? (
-                                                  <option value="">OVERALL BLOCK (ALL ITEMS)</option>
-                                              ) : (
-                                                  <option value="" disabled hidden>SELECT AN ITEM...</option>
-                                              )}
-                                              {rawItems.map((item, idx) => (
-                                                  item.isCombo && item.subItems ? (
-                                                      item.subItems.map((sub, sIdx) => (
-                                                          <option key={`sub-${idx}-${sIdx}`} value={sub}>{sub.toUpperCase()}</option>
-                                                      ))
-                                                  ) : (
-                                                      <option key={idx} value={item.name}>{item.name.toUpperCase()}</option>
-                                                  )
-                                              ))}
-                                          </select>
-                                      )}
-
-                                      {/* 5 Star Ratings Row */}
-                                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                          {[1, 2, 3, 4, 5].map(star => (
-                                              <span
-                                                  key={star}
-                                                  onClick={() => setRatings(prev => ({ ...prev, [block.id]: star }))}
-                                                  style={{
-                                                      cursor: 'pointer', fontSize: '2rem', lineHeight: 1,
-                                                      color: star <= (ratings[block.id] || 0) ? 'var(--highlight-cyan)' : 'transparent',
-                                                      WebkitTextStroke: '1px var(--highlight-cyan)',
-                                                      transition: 'all 0.2s'
-                                                  }}
-                                              >
-                                                  ★
-                                              </span>
-                                          ))}
-                                      </div>
-
-                                      {/* Text Box */}
-                                      <input
-                                          type="text"
-                                          className="input-field"
-                                          placeholder={`WRITE YOUR FEEDBACK...`}
-                                          value={texts[block.id] || ''}
-                                          onChange={(e) => setTexts(prev => ({ ...prev, [block.id]: e.target.value }))}
-                                      />
-
-                                      {/* Photo Upload Options */}
-                                      <div style={{ marginTop: '0.2rem' }}>
-                                          {!photos[block.id] ? (
-                                              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                  <button 
-                                                      type="button"
-                                                      onClick={() => document.getElementById(`photo-camera-${block.id}`).click()} 
-                                                      className="btn btn-outline hover-grow"
-                                                      style={{ flex: 1, padding: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', color: 'var(--text-main)', borderColor: 'var(--glass-border)', fontSize: '0.8rem' }}
-                                                  >
-                                                      <Camera size={16} /> Take Photo
-                                                  </button>
-                                                  <button 
-                                                      type="button"
-                                                      onClick={() => document.getElementById(`photo-gallery-${block.id}`).click()} 
-                                                      className="btn btn-outline hover-grow"
-                                                      style={{ flex: 1, padding: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', color: 'var(--text-main)', borderColor: 'var(--glass-border)', fontSize: '0.8rem' }}
-                                                  >
-                                                      <Image size={16} /> Open Gallery
-                                                  </button>
-                                              </div>
-                                          ) : (
-                                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 0.75rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
-                                                  <Paperclip size={14} color="var(--highlight-cyan)" />
-                                                  <span style={{ fontSize: '0.8rem', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{photos[block.id].name}</span>
-                                                  <button type="button" onClick={() => setPhotos(prev => ({ ...prev, [block.id]: null }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', display: 'flex' }}><X size={16} /></button>
-                                              </div>
-                                          )}
-                                          
-                                          {/* Camera Input */}
-                                          <input 
-                                              type="file" 
-                                              id={`photo-camera-${block.id}`} 
-                                              accept="image/*" 
-                                              capture="environment"
-                                              style={{ display: 'none' }}
-                                              onChange={(e) => {
-                                                  if (e.target.files && e.target.files[0]) {
-                                                      setPhotos(prev => ({ ...prev, [block.id]: e.target.files[0] }));
-                                                  }
-                                              }}
-                                          />
-                                          
-                                          {/* Gallery Input */}
-                                          <input 
-                                              type="file" 
-                                              id={`photo-gallery-${block.id}`} 
-                                              accept="image/*" 
-                                              style={{ display: 'none' }}
-                                              onChange={(e) => {
-                                                  if (e.target.files && e.target.files[0]) {
-                                                      setPhotos(prev => ({ ...prev, [block.id]: e.target.files[0] }));
-                                                  }
-                                              }}
-                                          />
-                                      </div>
-                                  </div>
-
-                                  <button className="btn btn-primary" onClick={() => handleCardSubmit(block.id)} style={{
-                                      width: '100%',
-                                      marginTop: '1.5rem',
-                                      textTransform: 'uppercase',
-                                      letterSpacing: '1px'
-                                  }}>
-                                      Submit Feedback
-                                  </button>
-                                  </div>
-                             </div>
-                        </div>
+        if (!block) return null;
+        const isFacility = block.isFacility;
+        const rawItems = isFacility ? [] : (currentMenuData[block.id] || []);
+        
+        return (
+            <div className="feedback-modal-wrapper animate-fade-in">
+                <div className="feedback-modal animate-pop-in" style={{ padding: 0 }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <button onClick={() => setExpandedBlock(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', color: 'var(--primary)' }}>
+                            <ArrowLeft size={24} />
+                        </button>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: '700', margin: 0, color: 'var(--primary)' }}>Rate This Item</h2>
                     </div>
-                );
+
+                    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem', textAlign: 'center' }}>{block.title}</div>
+                        {!isFacility && (
+                            <div style={{ width: '100%', marginBottom: '2rem' }}>
+                                <select
+                                    className="input-field"
+                                    value={selectedItems[block.id] || ''}
+                                    onChange={(e) => setSelectedItems(prev => ({ ...prev, [block.id]: e.target.value }))}
+                                >
+                                    {(block.id === 'lunch' || block.id === 'dinner') ? (
+                                        <option value="">Rate Entire Meal (All Items)</option>
+                                    ) : (
+                                        <option value="" disabled hidden>Select an item to rate...</option>
+                                    )}
+                                    {rawItems.map((item, idx) => (
+                                        item.isCombo && item.subItems ? (
+                                            item.subItems.map((sub, sIdx) => (
+                                                <option key={`sub-${idx}-${sIdx}`} value={sub}>{sub}</option>
+                                            ))
+                                        ) : (
+                                            <option key={idx} value={item.name}>{item.name}</option>
+                                        )
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '500' }}>
+                            How would you rate this?
+                        </div>
+
+                        {/* 5 Star Ratings Row */}
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
+                            {[1, 2, 3, 4, 5].map(star => {
+                                const active = star <= (ratings[block.id] || 0);
+                                return (
+                                    <button
+                                        key={star}
+                                        type="button"
+                                        onClick={() => setRatings(prev => ({ ...prev, [block.id]: star }))}
+                                        style={{
+                                            background: 'none', border: 'none', cursor: 'pointer', padding: '0.2rem',
+                                            color: active ? '#f59e0b' : '#cbd5e1',
+                                            transition: 'transform 0.1s ease',
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    >
+                                        <Star size={36} fill={active ? '#f59e0b' : 'none'} strokeWidth={active ? 0 : 1.5} />
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div style={{ width: '100%', textAlign: 'left', marginBottom: '1.5rem' }}>
+                            <label className="input-label" style={{ fontWeight: '500', color: 'var(--text-muted)' }}>Additional Feedback (Optional)</label>
+                            <textarea
+                                className="input-field"
+                                placeholder="Tell us more about this item..."
+                                value={texts[block.id] || ''}
+                                onChange={(e) => setTexts(prev => ({ ...prev, [block.id]: e.target.value }))}
+                                style={{ height: '100px', resize: 'none' }}
+                                maxLength={250}
+                            />
+                            <div style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                                {(texts[block.id] || '').length}/250
+                            </div>
+                        </div>
+
+                        <div style={{ width: '100%', marginBottom: '2rem' }}>
+                            {!photos[block.id] ? (
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <button 
+                                        type="button"
+                                        onClick={() => document.getElementById(`photo-camera-${block.id}`).click()} 
+                                        className="btn btn-outline"
+                                        style={{ flex: 1, padding: '0.6rem', color: 'var(--primary)', borderColor: 'var(--primary)', background: 'rgba(98,54,255,0.05)' }}
+                                    >
+                                        <Camera size={16} /> Photo
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={() => document.getElementById(`photo-gallery-${block.id}`).click()} 
+                                        className="btn btn-outline"
+                                        style={{ flex: 1, padding: '0.6rem', color: 'var(--primary)', borderColor: 'var(--primary)', background: 'rgba(98,54,255,0.05)' }}
+                                    >
+                                        <ImageIcon size={16} /> Gallery
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: '#f1f5f9', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                                    <Paperclip size={16} color="var(--primary)" />
+                                    <span style={{ fontSize: '0.85rem', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: '500' }}>{photos[block.id].name}</span>
+                                    <button type="button" onClick={() => setPhotos(prev => ({ ...prev, [block.id]: null }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', display: 'flex' }}><X size={18} /></button>
+                                </div>
+                            )}
+                            <input type="file" id={`photo-camera-${block.id}`} accept="image/*" capture="environment" style={{ display: 'none' }} onChange={(e) => { if (e.target.files && e.target.files[0]) setPhotos(prev => ({ ...prev, [block.id]: e.target.files[0] })); }} />
+                            <input type="file" id={`photo-gallery-${block.id}`} accept="image/*" style={{ display: 'none' }} onChange={(e) => { if (e.target.files && e.target.files[0]) setPhotos(prev => ({ ...prev, [block.id]: e.target.files[0] })); }} />
+                        </div>
+
+                        <button className="btn btn-primary" onClick={() => handleCardSubmit(block.id)} style={{ width: '100%', padding: '1rem', fontSize: '1.05rem' }}>
+                            Submit Feedback
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     if (!selectedDay) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Menu...</div>;
 
     return (
-        <div className="animate-fade-in" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <div className="animate-fade-in" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                <Utensils size={28} color="var(--primary)" />
+                <h1 style={{ fontSize: '1.75rem', fontWeight: '700', margin: 0 }}>Today's Menu</h1>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '2rem', fontWeight: '600' }}>
+                <span style={{ display: 'inline-block', width: '18px', height: '18px', background: 'none', border: '1.5px solid var(--text-main)', borderRadius: '4px', position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '2px', left: '2px', right: '2px', height: '3px', background: 'var(--text-main)', borderRadius: '1px' }}></div>
+                </span>
+                {displayDateStr}
+            </div>
 
-            {/* Top Day Selector Navbar */}
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '3rem' }}>
+            {/* Top Day Selector Navbar (Styled as clean pills) */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
                 {DAYS_OF_WEEK.map((day) => {
                     return day;
                 }).sort((a, b) => {
                     const priority = { "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7 };
                     return priority[a] - priority[b];
-                }).map(day => (
-                    <button
-                        key={day}
-                        onClick={() => { setSelectedDay(day); setExpandedBlock(null); setShowPhotoOptions(initialShowPhotoOptions); }}
-                        style={{
-                            background: day === selectedDay ? 'var(--tab-active-bg)' : 'transparent',
-                            color: 'var(--text-main)',
-                            border: '1px solid var(--glass-border)',
-                            padding: '0.6rem 1.5rem',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: '500',
-                            fontSize: '0.875rem',
-                            transition: 'all 0.2s'
-                        }}
-                    >
-                        {day}
-                    </button>
-                ))}
+                }).map(day => {
+                    const isActive = day === selectedDay;
+                    return (
+                        <button
+                            key={day}
+                            onClick={() => { setSelectedDay(day); setExpandedBlock(null); }}
+                            style={{
+                                background: isActive ? 'var(--primary)' : 'var(--bg-card)',
+                                color: isActive ? '#fff' : 'var(--text-muted)',
+                                border: `1px solid ${isActive ? 'var(--primary)' : 'var(--border-light)'}`,
+                                padding: '0.5rem 1.25rem',
+                                borderRadius: '20px',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                fontSize: '0.85rem',
+                                transition: 'all 0.2s',
+                                boxShadow: isActive ? '0 4px 10px rgba(98, 54, 255, 0.2)' : 'none'
+                            }}
+                        >
+                            {day}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Grid Layout of Meal Blocks */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
                 {MEAL_BLOCKS.map(block => {
                     const isFacility = block.isFacility;
                     const rawItems = isFacility ? [] : (currentMenuData[block.id] || []);
                     if (!isFacility && rawItems.length === 0) return null;
 
-                    const isExpanded = expandedBlock === block.id;
                     const currentHour = new Date().getHours();
                     const isToday = selectedDay === currentDay;
 
                     let isDisabled = false;
                     let disabledReason = "";
-                    let btnText = "Give Feedback";
+                    let btnText = "Rate Items";
 
                     if (!isToday) {
                         isDisabled = true;
                         disabledReason = "Feedback can only be given for today";
-                        btnText = "Feedback Locked";
+                        btnText = "Locked";
                     } else if (currentHour < block.unlockHour) {
                         isDisabled = true;
                         const displayTime = block.unlockHour <= 12
                             ? `${block.unlockHour === 0 ? 12 : block.unlockHour} AM`
                             : `${block.unlockHour - 12} PM`;
                         disabledReason = `Feedback unlocks at ${displayTime}`;
-                        btnText = "Not Yet Available";
+                        btnText = "Not Available";
                     }
 
                     return (
-                        <div key={block.id} className="glass-panel" style={{
-                            padding: '2rem',
+                        <div key={block.id} className="glass-card" style={{
+                            padding: '1.5rem',
                             display: 'flex',
                             flexDirection: 'column',
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '16px',
-                            position: 'relative'
+                            position: 'relative',
+                            minHeight: '350px'
                         }}>
 
-                            {/* Title & Pill Header */}
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', margin: 0 }}>{block.title}</h2>
-                                <span style={{
-                                    background: '#00e5ff',
-                                    color: '#000',
-                                    fontSize: '0.75rem',
-                                    padding: '0.3rem 0.8rem',
-                                    borderRadius: '12px',
-                                    fontWeight: 'bold'
-                                }}>
-                                    {block.time}
-                                </span>
+                            {/* Header */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                                {block.icon}
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: '700', margin: 0 }}>{block.title}</h2>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '500', marginBottom: '2rem' }}>
+                                <Clock size={14} />
+                                {block.time}
                             </div>
 
-                            {/* Menu String */}
-                            <div style={{ textAlign: 'center', fontSize: '0.875rem', lineHeight: '1.6', minHeight: '3rem', color: 'var(--text-main)', opacity: 0.9, marginBottom: '2rem' }}>
+                            {/* Menu Items List */}
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
                                 {isFacility ? (
-                                    <div style={{ fontSize: '0.95rem', marginTop: '1rem', color: '#00e5ff', opacity: 0.8 }}>
+                                    <div style={{ fontSize: '0.95rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '2rem' }}>
                                         General Facility Rating
                                     </div>
                                 ) : (
                                     rawItems.map((item, idx) => (
                                         <React.Fragment key={idx}>
                                             {item.isCombo && item.subItems ? (
-                                                <div style={{ marginBottom: '1rem' }}>
-                                                    <div style={{ fontWeight: '600', color: 'var(--highlight-cyan)', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
-                                                        {item.name.split(' (')[0]} (₹{item.price})
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '600', color: 'var(--text-main)', fontSize: '0.95rem' }}>
+                                                        <span>{item.name.split(' (')[0]}</span>
+                                                        <span style={{ color: 'var(--text-main)' }}>₹{item.price}</span>
                                                     </div>
                                                     {item.subItems.map((sub, sIdx) => (
-                                                        <div key={sIdx} style={{ fontSize: '0.85rem', opacity: 0.8, padding: '0.1rem 0' }}>{sub}</div>
+                                                        <div key={sIdx} style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{sub}</div>
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div style={{ marginBottom: '0.3rem' }}>{item.name} (₹{item.price})</div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.95rem', fontWeight: '500' }}>
+                                                    <span style={{ color: 'var(--text-main)' }}>{item.name}</span>
+                                                    <span style={{ color: 'var(--text-main)', fontWeight: '600' }}>₹{item.price}</span>
+                                                </div>
                                             )}
                                         </React.Fragment>
                                     ))
                                 )}
                             </div>
 
-                            {/* Dynamic Action Area */}
-                            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <div style={{ textAlign: 'center' }}>
-                                    <button
-                                        onClick={() => setExpandedBlock(block.id)}
-                                        className="btn btn-primary hover-grow"
-                                        disabled={isDisabled}
-                                        style={{
-                                            padding: '0.75rem 2.5rem',
-                                            fontSize: '0.875rem',
-                                            borderRadius: '8px',
-                                            width: '100%',
-                                            maxWidth: '250px',
-                                            opacity: isDisabled ? 0.5 : 1,
-                                            cursor: isDisabled ? 'not-allowed' : 'pointer'
-                                        }}
-                                        title={disabledReason}
-                                    >
-                                        {btnText}
-                                    </button>
-                                </div>
-                            </div>
-
+                            {/* Action Button */}
+                            <button
+                                onClick={() => setExpandedBlock(block.id)}
+                                className={`btn ${isDisabled ? 'btn-outline' : 'btn-primary'}`}
+                                disabled={isDisabled}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.8rem',
+                                    borderRadius: '8px',
+                                    opacity: isDisabled ? 0.6 : 1,
+                                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                    background: isDisabled ? 'var(--bg-main)' : 'var(--primary)',
+                                    color: isDisabled ? 'var(--text-muted)' : '#fff',
+                                    border: isDisabled ? '1px solid var(--border-light)' : 'none'
+                                }}
+                                title={disabledReason}
+                            >
+                                {btnText}
+                            </button>
                         </div>
                     );
                 })}
             </div>
-
 
             {/* Modal Overlay */}
             {renderModal()}
@@ -430,15 +406,18 @@ const UserDashboard = () => {
             {toast.show && (
                 <div className="animate-slide-up" style={{
                     position: 'fixed',
-                    bottom: '2rem',
-                    right: '2rem',
-                    background: toast.type === 'error' ? 'var(--danger)' : 'var(--primary)',
+                    bottom: '24px',
+                    right: '24px',
+                    background: toast.type === 'error' ? 'var(--danger)' : 'var(--success)',
                     color: '#fff',
-                    padding: '1rem 2rem',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                    padding: '1rem 1.5rem',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                     zIndex: 99999,
-                    fontWeight: 'bold'
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem'
                 }}>
                     {toast.message}
                 </div>

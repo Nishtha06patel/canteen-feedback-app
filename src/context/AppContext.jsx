@@ -16,7 +16,7 @@ export const AppProvider = ({ children }) => {
 
     const [theme, setTheme] = useState(() => {
         const stored = localStorage.getItem('canteen_theme');
-        return stored || 'dark';
+        return stored || 'light';
     });
 
     // Fallbacks for UI components using legacy arrays not yet supported by backend
@@ -82,9 +82,9 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const registerUser = async (email, password) => {
+    const registerUser = async (email, password, role = 'user', secretCode = '') => {
         try {
-            const { data } = await api.post('/auth/register', { email, password });
+            const { data } = await api.post('/auth/register', { email, password, role, secretCode });
             localStorage.setItem('canteen_token', data.token);
             setCurrentUser({ role: data.role, username: data.email, id: data.id });
             return true;
@@ -94,9 +94,9 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const loginUser = async (email, password) => {
+    const loginUser = async (email, password, role = 'user', secretCode = '') => {
         try {
-            const { data } = await api.post('/auth/login', { email, password });
+            const { data } = await api.post('/auth/login', { email, password, role, secretCode });
             localStorage.setItem('canteen_token', data.token);
             setCurrentUser({ role: data.role, username: data.email, id: data.id });
             return true;

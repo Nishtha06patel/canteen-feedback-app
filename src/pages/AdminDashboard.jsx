@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { Download, MoreVertical, Star } from 'lucide-react';
+import { format } from 'date-fns';
 
 const AdminDashboard = () => {
     const { feedbacks, registeredUsers } = useAppContext();
-    const [filter, setFilter] = useState('All Feedback');
+    const [filter, setFilter] = useState('All');
 
-    const filters = ['All Feedback', 'Morning Snack', 'Lunch', 'Evening Snack', 'Dinner', 'Full Day', 'Facility'];
+    const filters = ['All', 'Breakfast', 'Lunch', 'Evening Snack', 'Dinner', 'Full Day', 'Facility'];
 
     // Filter out orphaned feedbacks from deleted users and parse JSON messages
     const mappedFeedbacks = feedbacks.map(fb => {
@@ -14,23 +16,38 @@ const AdminDashboard = () => {
             details = JSON.parse(fb.message);
         } catch (e) {
             details = { text: fb.message };
+            // Try to parse legacy string format like "[Breakfast] Samosa - 3 Stars: not good"
+            const match = fb.message.match(/\[(.*?)\] .*? - (\d+) Stars?:?\s*(.*)/);
+            if (match) {
+                details.mealType = match[1];
+                details.stars = parseInt(match[2], 10);
+                details.text = match[3] || 'None';
+            }
         }
+
+        // Mock status based on ID to keep it consistent
+        const statuses = ['Resolved', 'Pending', 'Open'];
+        const status = statuses[fb.id % 3];
+
         return {
             id: fb.id,
             username: fb.user_email,
             timestamp: fb.created_at,
             mealType: details.mealType || 'Unknown',
+            mealItem: details.mealItem || '',
             starRating: details.stars || 0,
             feedbackText: details.text || (details.text === '' ? '' : fb.message),
-            photoId: details.photoId || null
+            photoBase64: details.photoBase64 || null,
+            photoName: details.photoName || null,
+            status: status
         };
     });
 
     const validFeedbacks = mappedFeedbacks.filter(fb => registeredUsers.some(u => u.email === fb.username) || fb.username === 'Anonymous');
 
     const filteredFeedbacks = validFeedbacks.filter(fb => {
-        if (filter === 'All Feedback') return true;
-        if (filter === 'Morning Snack') return fb.mealType === 'Breakfast';
+        if (filter === 'All') return true;
+        if (filter === 'Breakfast') return fb.mealType === 'Breakfast';
         if (filter === 'Lunch') return fb.mealType === 'Lunch';
         if (filter === 'Evening Snack') return fb.mealType === 'Evening Snack';
         if (filter === 'Dinner') return fb.mealType === 'Dinner';
@@ -107,7 +124,6 @@ const AdminDashboard = () => {
                 </tbody>
             </table>
             <script>
-                // Bypass unreliable window.onload for injected DOMs by deferring execution securely 
                 setTimeout(function() {
                     window.print();
                 }, 500);
@@ -121,54 +137,112 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="animate-fade-in" style={{ flex: 1, padding: '1rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-            <h1 style={{ fontSize: '2rem', marginBottom: '2rem' }}>Feedback Feed</h1>
+        <div className="animate-fade-in" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+            <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>Feedback Feed</h1>
+                <button 
+                    onClick={handleExportPDF} 
+                    className="btn btn-outline hover-grow" 
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', borderRadius: '8px' }}
+                >
+                    <Download size={16} /> Export
+                </button>
+            </div>
 
-            {/* Top Bar Actions */}
-            <div style={{ display: 'flex', marginBottom: '2rem', flexWrap: 'wrap' }}>
-                {/* Filter Pills */}
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    {filters.map(f => (
+            {/* Filter Pills */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+                {filters.map(f => {
+                    const isActive = filter === f;
+                    return (
                         <button 
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`btn ${filter === f ? 'btn-primary' : 'btn-outline'}`}
-                            style={{ padding: '0.4rem 1rem', fontSize: '0.875rem', borderRadius: '20px' }}
+                            style={{ 
+                                padding: '0.4rem 1.25rem', 
+                                fontSize: '0.85rem', 
+                                borderRadius: '20px',
+                                border: `1px solid ${isActive ? 'var(--primary)' : 'var(--border-light)'}`,
+                                background: isActive ? 'var(--primary)' : 'var(--bg-card)',
+                                color: isActive ? '#fff' : 'var(--text-muted)',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                boxShadow: isActive ? '0 4px 10px rgba(98, 54, 255, 0.2)' : 'none'
+                            }}
                         >
                             {f}
                         </button>
-                    ))}
-                </div>
+                    );
+                })}
             </div>
 
             {filteredFeedbacks.length === 0 ? (
-                <div className="glass-panel animate-slide-up" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>No feedback matches this filter</h2>
+                <div className="glass-card animate-slide-up" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+                    <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: '600' }}>No feedback matches this filter</h2>
                     <p style={{ color: 'var(--text-muted)' }}>Feedback submissions will appear here instantly.</p>
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {filteredFeedbacks.map((fb) => (
-                        <div key={fb.id} className="glass-panel animate-slide-up" style={{ padding: '1.5rem', borderLeft: `4px solid var(--primary)` }}>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
-                                <p style={{ fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-                                    User: <span style={{ fontWeight: 'normal', color: 'var(--text-main)' }}>{fb.username}</span>
-                                </p>
-                                <p><span style={{ fontWeight: 'bold' }}>Meal:</span> {fb.mealType || 'Lunch'}</p>
-                                <p style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                    <span style={{ fontWeight: 'bold' }}>Rating: </span>
-                                    <span>{'⭐'.repeat(fb.starRating)}</span>
-                                </p>
-                                <p><span style={{ fontWeight: 'bold' }}>Feedback: </span> {fb.feedbackText || 'None'}</p>
+                        <div key={fb.id} className="glass-card animate-slide-up" style={{ padding: '1.5rem', display: 'flex', gap: '1.5rem' }}>
+                            {/* Avatar */}
+                            <div style={{ 
+                                width: '48px', 
+                                height: '48px', 
+                                borderRadius: '50%', 
+                                background: 'var(--primary)', 
+                                color: 'white', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                fontWeight: '700',
+                                fontSize: '1.25rem',
+                                flexShrink: 0
+                            }}>
+                                {fb.username.substring(0, 2).toUpperCase()}
+                            </div>
+                            
+                            {/* Content */}
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div className="flex-between">
+                                    <div style={{ fontWeight: '700', fontSize: '1.05rem', color: 'var(--text-main)' }}>{fb.username}</div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '500' }}>
+                                            {format(new Date(fb.timestamp), 'dd MMM yyyy')}
+                                        </span>
+                                        <span className={`status-pill status-${fb.status.toLowerCase()}`}>
+                                            {fb.status}
+                                        </span>
+                                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0.2rem' }}>
+                                            <MoreVertical size={18} />
+                                        </button>
+                                    </div>
+                                </div>
                                 
+                                <div style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '600' }}>
+                                    Meal: <span style={{ color: 'var(--primary)' }}>{fb.mealType} {fb.mealItem ? `(${fb.mealItem})` : ''}</span>
+                                </div>
+                                
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: '600' }}>
+                                    Rating: 
+                                    <div style={{ display: 'flex', gap: '2px' }}>
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <Star key={star} size={16} fill={star <= fb.starRating ? '#f59e0b' : 'none'} color={star <= fb.starRating ? '#f59e0b' : '#cbd5e1'} strokeWidth={star <= fb.starRating ? 0 : 2} />
+                                        ))}
+                                    </div>
+                                    <span style={{ color: 'var(--text-muted)' }}>{fb.starRating}/5</span>
+                                </div>
+                                
+                                <div style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '500', marginTop: '0.25rem', lineHeight: '1.5' }}>
+                                    <span style={{ fontWeight: '600' }}>Feedback:</span> {fb.feedbackText || 'None'}
+                                </div>
+                                
+                                {/* Photo rendering */}
                                 {(fb.photoBase64 || fb.photoName) && (
-                                    <div style={{ marginTop: '0.75rem' }}>
+                                    <div style={{ marginTop: '1rem' }}>
                                         {fb.photoBase64 ? (
-                                            <div style={{ display: 'inline-flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
-                                                <img src={fb.photoBase64} style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', border: '1px solid var(--glass-border)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} alt='Feedback Upload' />
-                                                <div>
-                                                    <a href={fb.photoBase64} download={`Evidence_${fb.id}.jpg`} className="btn btn-outline hover-grow" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', padding: '0.4rem 0.8rem', textDecoration: 'none', color: 'var(--text-main)', borderColor: 'var(--glass-border)', borderRadius: '6px' }}>Download Image</a>
-                                                </div>
+                                            <div style={{ display: 'inline-flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                <img src={fb.photoBase64} style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', border: '1px solid var(--border-light)' }} alt='Feedback Evidence' />
                                             </div>
                                         ) : (
                                             <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>[Legacy System File: {fb.photoName}]</span>
@@ -178,28 +252,6 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     ))}
-                    
-                    {/* Export Button At The End */}
-                    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-                        <button 
-                            onClick={handleExportPDF} 
-                            className="btn btn-primary hover-grow" 
-                            style={{ 
-                                padding: '0.8rem 2.5rem', 
-                                fontWeight: 'bold', 
-                                fontSize: '1rem',
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: '0.75rem', 
-                                borderRadius: '12px',
-                                background: 'linear-gradient(135deg, var(--danger), #ff4757)',
-                                border: 'none',
-                                color: 'white'
-                            }}
-                        >
-                            📄 Export PDF Document
-                        </button>
-                    </div>
                 </div>
             )}
         </div>

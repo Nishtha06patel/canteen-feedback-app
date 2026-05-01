@@ -11,15 +11,28 @@ const generateToken = (id) => {
 
 export const register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role = 'user', secretCode = '' } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ message: 'Please provide email and password' });
         }
 
-        // Validate email domain
-        if (!email.toLowerCase().endsWith('@iar.ac.in')) {
-            return res.status(400).json({ message: 'Email must belong to @iar.ac.in domain' });
+        // Validate role
+        if (role !== 'user' && role !== 'admin') {
+            return res.status(400).json({ message: 'Invalid role provided' });
+        }
+
+        // Admin Secret Code Validation
+        if (role === 'admin') {
+            const expectedCode = process.env.ADMIN_SECRET_CODE || 'IAR-ADMIN-2026';
+            if (secretCode !== expectedCode) {
+                return res.status(403).json({ message: 'Invalid Admin Secret Code' });
+            }
+        }
+
+        // Validate email domain for students
+        if (role === 'user' && !email.toLowerCase().endsWith('@iar.ac.in')) {
+            return res.status(400).json({ message: 'Student email must belong to @iar.ac.in domain' });
         }
 
         // Check if user exists
@@ -32,10 +45,10 @@ export const register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Insert new user
+        // Insert new user with the specified role
         const result = await query(
-            'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, role',
-            [email.toLowerCase(), hashedPassword]
+            'INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) RETURNING id, email, role',
+            [email.toLowerCase(), hashedPassword, role]
         );
 
         const user = result.rows[0];
@@ -54,10 +67,18 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role = 'user', secretCode = '' } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ message: 'Please provide email and password' });
+        }
+
+        // Admin Secret Code Validation during Login
+        if (role === 'admin') {
+            const expectedCode = process.env.ADMIN_SECRET_CODE || 'IAR-ADMIN-2026';
+            if (secretCode !== expectedCode) {
+                return res.status(403).json({ message: 'Invalid Admin Secret Code' });
+            }
         }
 
         // Fetch user
@@ -68,6 +89,11 @@ export const login = async (req, res) => {
         }
 
         const user = result.rows[0];
+
+        // Ensure role matches what they are trying to log in as
+        if (user.role !== role) {
+            return res.status(403).json({ message: `Account exists, but not as an ${role}` });
+        }
 
         // Compare password
         const isMatch = await bcrypt.compare(password, user.password_hash);

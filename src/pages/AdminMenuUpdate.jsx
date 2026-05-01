@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Upload, Download, Archive, ArrowLeft } from 'lucide-react';
+import { Upload, Download, Archive, CalendarDays } from 'lucide-react';
 import { processMenuUpload } from '../utils/pdfParser';
 import { savePdfRecord, getAllPdfRecords, fileToBase64 } from '../utils/db';
 import JSZip from 'jszip';
@@ -51,7 +51,6 @@ const AdminMenuUpdate = () => {
         try {
             const { daysUpdated, itemsParsed } = await processMenuUpload(file, updateMenuForDate);
             
-            // Generate DB record
             const base64Data = await fileToBase64(file);
             await savePdfRecord({
                 id: Date.now(),
@@ -68,7 +67,7 @@ const AdminMenuUpdate = () => {
             alert(`Failed to process PDF: ${error.message}`);
         } finally {
             setIsUploading(false);
-            e.target.value = null; // reset input
+            e.target.value = null; 
         }
     };
 
@@ -80,7 +79,6 @@ const AdminMenuUpdate = () => {
         if (uploadHistory.length === 0) return alert("No PDFs to export");
         const zip = new JSZip();
         uploadHistory.forEach((record, index) => {
-            // Strip the standard base64 data URI wrapper
             const b64Data = record.base64.split(',')[1];
             const safeFileName = `${index + 1}_${record.filename}`;
             zip.file(safeFileName, b64Data, { base64: true });
@@ -91,9 +89,9 @@ const AdminMenuUpdate = () => {
     };
 
     const renderHeader = () => (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '0 1rem' }}>
             <button onClick={prevMonth} className="btn btn-outline" style={{ padding: '0.4rem 1rem' }}>&larr; Prev</button>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{format(currentMonth, 'MMMM yyyy')}</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>{format(currentMonth, 'MMMM yyyy')}</h2>
             <button onClick={nextMonth} className="btn btn-outline" style={{ padding: '0.4rem 1rem' }}>Next &rarr;</button>
         </div>
     );
@@ -102,7 +100,7 @@ const AdminMenuUpdate = () => {
         return (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: '0.5rem' }}>
                 {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
-                    <div key={d} style={{textAlign:'center', fontWeight:'bold', color:'var(--text-muted)'}}>{d}</div>
+                    <div key={d} style={{textAlign:'center', fontWeight:'700', color:'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase' }}>{d}</div>
                 ))}
             </div>
         );
@@ -130,16 +128,17 @@ const AdminMenuUpdate = () => {
                                 padding: '1rem',
                                 textAlign: 'center',
                                 cursor: 'pointer',
-                                borderRadius: '8px',
-                                background: isSelected ? 'var(--primary)' : (isCurrentMonth ? 'rgba(255,255,255,0.05)' : 'transparent'),
-                                border: isSelected ? '1px solid var(--highlight-cyan)' : '1px solid transparent',
-                                color: isCurrentMonth ? 'var(--text-main)' : 'var(--text-muted)',
+                                borderRadius: '12px',
+                                background: isSelected ? 'var(--primary)' : (isCurrentMonth ? '#f8fafc' : 'transparent'),
+                                border: isSelected ? '1px solid var(--primary)' : '1px solid transparent',
+                                color: isSelected ? '#fff' : (isCurrentMonth ? 'var(--text-main)' : 'var(--text-muted)'),
                                 transition: 'all 0.2s',
-                                fontWeight: isSelected ? 'bold' : 'normal'
+                                fontWeight: isSelected ? '700' : '500',
+                                boxShadow: isSelected ? '0 4px 12px rgba(98, 54, 255, 0.2)' : 'none'
                             }}
                             className="hover-grow"
                         >
-                            <span style={{ color: isSelected ? '#000' : 'inherit' }}>{format(day, 'd')}</span>
+                            <span>{format(day, 'd')}</span>
                         </div>
                     );
                 })}
@@ -185,7 +184,7 @@ const AdminMenuUpdate = () => {
                 if (!isNaN(parsedPrice)) {
                     price = parsedPrice;
                 }
-                subItemsText = parts.slice(1).join('|'); // Join in case there are multiple |
+                subItemsText = parts.slice(1).join('|');
             }
             const itemsList = subItemsText.split(',').map(s => s.trim()).filter(s => s);
             
@@ -199,7 +198,7 @@ const AdminMenuUpdate = () => {
             const itemsList = editValue.split(',').map(s => s.trim()).filter(s => s);
             newItemsArray = itemsList.map(itemStr => {
                 let name = itemStr;
-                let price = 30; // default
+                let price = 30; 
                 
                 if (itemStr.includes('-')) {
                     const lastDashIdx = itemStr.lastIndexOf('-');
@@ -229,26 +228,21 @@ const AdminMenuUpdate = () => {
     };
 
     return (
-        <div className="animate-fade-in" style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                <button 
-                    onClick={() => navigate('/admin/dashboard')} 
-                    className="btn btn-outline hover-grow" 
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderColor: 'var(--glass-border)' }}
-                >
-                    <ArrowLeft size={18} /> Back to Dashboard
-                </button>
-            </div>
+        <div className="animate-fade-in" style={{ padding: '0 1rem', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+            
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', margin: 0 }}>Menu Update</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <CalendarDays size={28} color="var(--primary)" />
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>Menu Update</h1>
+                </div>
                 <label className="btn btn-primary hover-grow" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: isUploading ? 'not-allowed' : 'pointer', opacity: isUploading ? 0.7 : 1 }}>
-                    <Upload size={20} />
-                    {isUploading ? 'Parsing PDF...' : 'Bulk Upload PDF'}
+                    <Upload size={18} />
+                    {isUploading ? 'Parsing...' : 'Bulk Upload PDF'}
                     <input type="file" accept="application/pdf" style={{ display: 'none' }} onChange={handleFileUpload} disabled={isUploading} />
                 </label>
             </div>
             
-            <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
+            <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
                 {renderHeader()}
                 {renderDays()}
                 {renderCells()}
@@ -265,9 +259,9 @@ const AdminMenuUpdate = () => {
                                     <span style={{ fontSize: '1.2rem' }}>←</span> BACK
                                 </button>
                                 
-                                <h2 style={{ fontSize: '1.25rem', fontWeight: '900', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: '900', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-main)' }}>
                                     Menu for {format(selectedDate, 'eeee, MMMM do, yyyy')}
-                                </h2>
+                               </h2>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', paddingBottom: '1rem' }}>
                                 {MEAL_BLOCKS.map(block => {
@@ -275,11 +269,11 @@ const AdminMenuUpdate = () => {
                                     const isEditing = editingBlock === block.id;
 
                                     return (
-                                        <div key={block.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', background: 'rgba(255,255,255,0.03)' }}>
+                                        <div key={block.id} className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', background: '#f8fafc', boxShadow: 'none' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                                <h3 style={{ margin: 0, color: 'var(--highlight-cyan)' }}>{block.title}</h3>
+                                                <h3 style={{ margin: 0, color: 'var(--primary)', fontWeight: '700', fontSize: '1.1rem' }}>{block.title}</h3>
                                                 {!isEditing && (
-                                                    <button onClick={() => handleEditClick(block)} className="btn btn-outline" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>Edit</button>
+                                                    <button onClick={() => handleEditClick(block)} className="btn btn-outline" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', background: '#fff' }}>Edit</button>
                                                 )}
                                             </div>
 
@@ -303,12 +297,12 @@ const AdminMenuUpdate = () => {
                                                         <div style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>No items</div>
                                                     ) : (
                                                         block.isCombo && items[0]?.subItems ? (
-                                                            <div style={{ whiteSpace: 'pre-line', lineHeight: '1.8' }}>
+                                                            <div style={{ whiteSpace: 'pre-line', lineHeight: '1.8', fontWeight: '500' }}>
                                                                 {items[0].subItems.join('\n')}
-                                                                <br/><span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Combo - ₹{items[0].price})</span>
+                                                                <br/><span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: '700' }}>(Combo - ₹{items[0].price})</span>
                                                             </div>
                                                         ) : (
-                                                            <div style={{ whiteSpace: 'pre-line', lineHeight: '1.8' }}>
+                                                            <div style={{ whiteSpace: 'pre-line', lineHeight: '1.8', fontWeight: '500' }}>
                                                                 {items.map(i => `${i.name} (₹${i.price})`).join('\n')}
                                                             </div>
                                                         )
@@ -326,35 +320,35 @@ const AdminMenuUpdate = () => {
             )}
 
             {/* Upload History Section */}
-            <div className="glass-panel" style={{ padding: '2rem', marginTop: '3rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '1rem' }}>
-                    <h2 style={{ fontSize: '1.5rem', color: 'var(--text-main)', margin: 0 }}>Uploaded PDF History</h2>
+            <div className="glass-card" style={{ padding: '2rem', marginTop: '3rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem' }}>
+                    <h2 style={{ fontSize: '1.25rem', color: 'var(--text-main)', margin: 0, fontWeight: '700' }}>Uploaded PDF History</h2>
                     <button onClick={handleExportAll} disabled={uploadHistory.length === 0} className="btn btn-outline hover-grow" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: uploadHistory.length === 0 ? 0.5 : 1, cursor: uploadHistory.length === 0 ? 'not-allowed' : 'pointer' }}>
-                        <Archive size={18} /> Export All PDFs (ZIP)
+                        <Archive size={16} /> Export ZIP
                     </button>
                 </div>
                 
                 {uploadHistory.length === 0 ? (
-                    <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                        No PDFs uploaded yet. Upload a menu PDF using the button at the top to record its history here.
+                    <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.9rem' }}>
+                        No PDFs uploaded yet. Upload a menu PDF using the button at the top.
                     </div>
                 ) : (
                     <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
                         <thead>
-                            <tr style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--glass-border)' }}>
-                                <th style={{ padding: '1rem' }}>Date Uploaded</th>
-                                <th style={{ padding: '1rem' }}>File Name</th>
-                                <th style={{ padding: '1rem' }}>Data Extracted</th>
-                                <th style={{ padding: '1rem', textAlign: 'center' }}>Download</th>
+                            <tr style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border-light)' }}>
+                                <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>Date Uploaded</th>
+                                <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>File Name</th>
+                                <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>Data Extracted</th>
+                                <th style={{ padding: '1rem', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600' }}>Download</th>
                             </tr>
                         </thead>
                         <tbody>
                             {uploadHistory.map(record => (
-                                <tr key={record.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s', ':hover': { background: 'rgba(255,255,255,0.02)' } }}>
-                                    <td style={{ padding: '1rem' }}>{format(new Date(record.timestamp), 'dd MMM yyyy, HH:mm')}</td>
-                                    <td style={{ padding: '1rem', fontWeight: '500', color: 'var(--highlight-cyan)' }}>{record.filename}</td>
+                                <tr key={record.id} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s', ':hover': { background: '#f8fafc' } }}>
+                                    <td style={{ padding: '1rem', fontSize: '0.9rem', fontWeight: '500' }}>{format(new Date(record.timestamp), 'dd MMM yyyy, HH:mm')}</td>
+                                    <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)', fontSize: '0.9rem' }}>{record.filename}</td>
                                     <td style={{ padding: '1rem' }}>
-                                        <span style={{ background: 'var(--glass-bg)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem' }}>
+                                        <span style={{ background: 'rgba(98, 54, 255, 0.1)', color: 'var(--primary)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600' }}>
                                             {record.itemsParsed} items ({record.daysUpdated} days)
                                         </span>
                                     </td>
@@ -362,9 +356,9 @@ const AdminMenuUpdate = () => {
                                         <button 
                                             onClick={() => handleDownloadIndividual(record)} 
                                             className="btn btn-outline hover-grow" 
-                                            style={{ color: 'var(--primary)', borderColor: 'var(--primary)', padding: '0.3rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}
+                                            style={{ color: 'var(--primary)', borderColor: 'var(--primary)', padding: '0.3rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto', background: '#fff' }}
                                         >
-                                            <Download size={14} /> Download File
+                                            <Download size={14} /> File
                                         </button>
                                     </td>
                                 </tr>
