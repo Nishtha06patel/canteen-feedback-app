@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import AdminMenuUpdate from './pages/AdminMenuUpdate';
 import AppAdmin from './pages/AppAdmin';
+import StaffDashboard from './pages/StaffDashboard';
 import NavBar from './components/NavBar';
 import Sidebar from './components/Sidebar';
 
@@ -21,9 +22,9 @@ const ProtectedRoute = ({ children, roleRequired }) => {
         return <Navigate to="/login" replace />;
     }
     if (roleRequired && currentUser.role !== roleRequired) {
-        return currentUser.role === 'admin'
-            ? <Navigate to="/admin/dashboard" replace />
-            : <Navigate to="/user/dashboard" replace />;
+        if (currentUser.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+        if (currentUser.role === 'staff') return <Navigate to="/staff/dashboard" replace />;
+        return <Navigate to="/user/dashboard" replace />;
     }
     return children;
 };
@@ -38,14 +39,39 @@ const AppContent = () => {
                     {currentUser?.role === 'admin' && <Sidebar />}
                     <main className="page-content">
                         <Routes>
-                            <Route path="/" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <Landing />} />
-                            <Route path="/login" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <Login />} />
+                            <Route path="/" element={
+                                currentUser 
+                                    ? <Navigate to={
+                                        currentUser.role === 'admin' 
+                                            ? "/admin/dashboard" 
+                                            : currentUser.role === 'staff' 
+                                                ? "/staff/dashboard" 
+                                                : "/user/dashboard"
+                                      } replace /> 
+                                    : <Landing />
+                            } />
+                            <Route path="/login" element={
+                                currentUser 
+                                    ? <Navigate to={
+                                        currentUser.role === 'admin' 
+                                            ? "/admin/dashboard" 
+                                            : currentUser.role === 'staff' 
+                                                ? "/staff/dashboard" 
+                                                : "/user/dashboard"
+                                      } replace /> 
+                                    : <Login />
+                            } />
                             <Route path="/forgot-password" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <ForgotPassword />} />
                             <Route path="/signup" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <Signup />} />
                             <Route path="/admin/forgot-password" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <AdminForgotPassword />} />
                             <Route path="/user/dashboard" element={
                                 <ProtectedRoute roleRequired="user">
                                     <UserDashboard />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/staff/dashboard" element={
+                                <ProtectedRoute roleRequired="staff">
+                                    <StaffDashboard />
                                 </ProtectedRoute>
                             } />
                             <Route path="/admin/dashboard" element={

@@ -18,7 +18,7 @@ export const register = async (req, res) => {
         }
 
         // Validate role
-        if (role !== 'user' && role !== 'admin') {
+        if (role !== 'user' && role !== 'admin' && role !== 'staff') {
             return res.status(400).json({ message: 'Invalid role provided' });
         }
 
@@ -30,9 +30,9 @@ export const register = async (req, res) => {
             }
         }
 
-        // Validate email domain for students
-        if (role === 'user' && !email.toLowerCase().endsWith('@iar.ac.in')) {
-            return res.status(400).json({ message: 'Student email must belong to @iar.ac.in domain' });
+        // Validate email domain for students and staff
+        if ((role === 'user' || role === 'staff') && !email.toLowerCase().endsWith('@iar.ac.in')) {
+            return res.status(400).json({ message: 'Email must belong to @iar.ac.in domain' });
         }
 
         // Check if user exists

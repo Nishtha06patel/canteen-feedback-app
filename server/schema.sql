@@ -1,8 +1,14 @@
 -- Define Enum for roles to ensure strict values
 DO $$ BEGIN
-    CREATE TYPE user_role AS ENUM ('user', 'admin');
+    CREATE TYPE user_role AS ENUM ('user', 'admin', 'staff');
 EXCEPTION
-    WHEN duplicate_object THEN null;
+    WHEN duplicate_object THEN 
+        -- If enum exists, try to add staff if it doesn't exist
+        BEGIN
+            ALTER TYPE user_role ADD VALUE 'staff';
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END;
 END $$;
 
 -- Users Table

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Utensils, Eye, EyeOff } from 'lucide-react';
+import { Utensils, Eye, EyeOff, GraduationCap, Shield, ChefHat, User } from 'lucide-react';
 
 const Login = () => {
     const { loginUser } = useAppContext();
     const navigate = useNavigate();
 
-    const [role, setRole] = useState('user'); // 'user' or 'admin'
+    const [role, setRole] = useState(''); // Default to empty to force selection
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +22,11 @@ const Login = () => {
         e.preventDefault();
         setError('');
 
+        if (!role) {
+            setError('Please select your role.');
+            return;
+        }
+
         if (role === 'admin' && !secretCode) {
             setError('Admin secret code is required.');
             return;
@@ -29,8 +34,14 @@ const Login = () => {
 
         setIsLoading(true);
         try {
+            // Map UI labels to backend role keys
+            // Admin -> 'admin', Canteen Staff -> 'staff', Student -> 'user'
             await loginUser(email.trim().toLowerCase(), password, role, secretCode);
-            navigate(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+            
+            // Redirection logic
+            if (role === 'admin') navigate('/admin/dashboard');
+            else if (role === 'staff') navigate('/staff/dashboard');
+            else navigate('/user/dashboard');
         } catch (err) {
             setError(err.message);
             setIsLoading(false);
@@ -51,64 +62,59 @@ const Login = () => {
         }}>
             <div className="glass-card animate-slide-up" style={{ 
                 width: '100%', 
-                maxWidth: '400px', 
-                padding: '3rem 2rem', 
+                maxWidth: '420px', 
+                padding: '3rem 2.5rem', 
                 textAlign: 'center',
                 background: 'var(--glass-bg)',
-                backdropFilter: 'blur(20px)'
+                backdropFilter: 'blur(20px)',
+                borderRadius: '24px'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                    <div style={{ background: 'rgba(98, 54, 255, 0.1)', padding: '1rem', borderRadius: '50%' }}>
-                        <Utensils size={32} color="var(--primary)" />
+                    <div style={{ background: 'rgba(98, 54, 255, 0.1)', padding: '1rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <GraduationCap size={40} color="var(--primary)" />
                     </div>
                 </div>
                 
-                {/* Role Switcher */}
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                     <div style={{ display: 'flex', background: 'var(--toggle-bg)', borderRadius: '30px', padding: '4px' }}>
-                        <button
-                            type="button"
-                            onClick={() => { setRole('user'); setError(''); }}
-                            style={{ padding: '0.4rem 1.25rem', borderRadius: '30px', border: 'none', background: role === 'user' ? 'var(--toggle-active)' : 'transparent', color: role === 'user' ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: '700', fontSize: '0.8rem', boxShadow: role === 'user' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none' }}
-                        >
-                            STUDENT
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => { setRole('admin'); setError(''); }}
-                            style={{ padding: '0.4rem 1.25rem', borderRadius: '30px', border: 'none', background: role === 'admin' ? 'var(--toggle-active)' : 'transparent', color: role === 'admin' ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: '700', fontSize: '0.8rem', boxShadow: role === 'admin' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none' }}
-                        >
-                            ADMIN
-                        </button>
-                    </div>
-                </div>
-
-                <h1 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: '700' }}>
-                    {role === 'user' ? 'Student Portal' : 'Admin Portal'}
+                <h1 style={{ marginBottom: '0.25rem', fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                    Welcome Back
                 </h1>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.9rem' }}>Sign in to your account</p>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '0.95rem', fontWeight: '500' }}>Sign in to your account</p>
                 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     <div style={{ textAlign: 'left' }}>
-                        <label className="input-label">Registered Email</label>
-                        <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setError(''); }} placeholder={role === 'user' ? "your.name@iar.ac.in" : "admin@iar.ac.in"} className="input-field" required />
+                        <label className="input-label" style={{ fontWeight: '700' }}>Registered Email</label>
+                        <div style={{ position: 'relative' }}>
+                            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', display: 'flex' }}>
+                                <User size={18} />
+                            </div>
+                            <input 
+                                type="email" 
+                                value={email} 
+                                onChange={(e) => { setEmail(e.target.value); setError(''); }} 
+                                placeholder="your.name@iar.ac.in" 
+                                className="input-field" 
+                                style={{ paddingLeft: '3rem' }}
+                                required 
+                            />
+                        </div>
                     </div>
                     
                     <div style={{ textAlign: 'left' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', alignItems: 'center' }}>
-                            <label className="input-label" style={{ marginBottom: 0 }}>Password</label>
-                            {role === 'user' && (
-                                <Link to="/forgot-password" style={{ fontSize: '0.75rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>Forgot password?</Link>
-                            )}
+                            <label className="input-label" style={{ marginBottom: 0, fontWeight: '700' }}>Password</label>
+                            <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '700' }}>Forgot password?</Link>
                         </div>
                         <div style={{ position: 'relative' }}>
+                            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', display: 'flex' }}>
+                                <Shield size={18} />
+                            </div>
                             <input 
                                 type={showPassword ? 'text' : 'password'} 
                                 value={password} 
                                 onChange={(e) => { setPassword(e.target.value); setError(''); }} 
                                 placeholder="Enter your password" 
                                 className="input-field" 
-                                style={{ paddingRight: '2.5rem' }}
+                                style={{ paddingLeft: '3rem', paddingRight: '2.5rem' }}
                                 required 
                             />
                             <button 
@@ -121,9 +127,35 @@ const Login = () => {
                         </div>
                     </div>
 
+                    <div style={{ textAlign: 'left' }}>
+                        <label className="input-label" style={{ fontWeight: '700' }}>Role</label>
+                        <div style={{ position: 'relative' }}>
+                            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', display: 'flex', pointerEvents: 'none' }}>
+                                {role === 'admin' ? <Shield size={18} /> : role === 'staff' ? <ChefHat size={18} /> : <GraduationCap size={18} />}
+                            </div>
+                            <select 
+                                value={role} 
+                                onChange={(e) => { setRole(e.target.value); setError(''); }} 
+                                className="input-field" 
+                                style={{ paddingLeft: '3rem', cursor: 'pointer', appearance: 'none' }}
+                                required
+                            >
+                                <option value="" disabled>Select your role</option>
+                                <option value="admin">Admin</option>
+                                <option value="staff">Canteen Staff</option>
+                                <option value="user">Student</option>
+                            </select>
+                            <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none', display: 'flex' }}>
+                                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
                     {role === 'admin' && (
                         <div className="animate-fade-in" style={{ textAlign: 'left' }}>
-                            <label className="input-label">Admin Secret Code</label>
+                            <label className="input-label" style={{ fontWeight: '700' }}>Admin Secret Code</label>
                             <div style={{ position: 'relative' }}>
                                 <input 
                                     type={showSecretCode ? 'text' : 'password'} 
@@ -145,26 +177,22 @@ const Login = () => {
                         </div>
                     )}
 
-                    {error && <p className="animate-fade-in" style={{ color: 'var(--danger)', fontSize: '0.85rem', fontWeight: '600' }}>{error}</p>}
+                    {error && <p className="animate-fade-in" style={{ color: 'var(--danger)', fontSize: '0.85rem', fontWeight: '600', marginTop: '-0.5rem' }}>{error}</p>}
                     
-                    <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', padding: '0.8rem' }} disabled={isLoading}>
+                    <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', padding: '1rem', fontSize: '1rem', borderRadius: '12px' }} disabled={isLoading}>
                         {isLoading ? 'Logging In...' : 'Log In'}
                     </button>
                 </form>
 
-                {role === 'user' && (
-                    <>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.5rem 0' }}>
-                            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>OR</span>
-                            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
-                        </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '2rem 0' }}>
+                    <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>OR</span>
+                    <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
+                </div>
 
-                        <Link to="/signup" style={{ color: 'var(--text-main)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: '500' }}>
-                            Don't have an account? <span style={{ color: 'var(--primary)', fontWeight: '700' }}>Sign Up</span>
-                        </Link>
-                    </>
-                )}
+                <Link to="/signup" style={{ color: 'var(--text-main)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600' }}>
+                    Don't have an account? <span style={{ color: 'var(--primary)', fontWeight: '800' }}>Sign Up</span>
+                </Link>
             </div>
         </div>
     );
