@@ -224,7 +224,7 @@ const AdminDashboard = () => {
                                         <span className={`status-pill status-${fb.status.toLowerCase()}`}>
                                             {fb.status}
                                         </span>
-                                        {currentUser?.role === 'admin' && (
+                                        {(currentUser?.role === 'admin' || currentUser?.role === 'staff') && (
                                             <div style={{ position: 'relative' }}>
                                                 <button 
                                                     onClick={() => setOpenDropdownId(openDropdownId === fb.id ? null : fb.id)}

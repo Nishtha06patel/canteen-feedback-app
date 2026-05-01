@@ -12,7 +12,7 @@ const AdminMenuUpdate = () => {
     const { currentUser, getMenuForDate, updateMenuForDate } = useAppContext();
     const navigate = useNavigate();
     
-    const isAdmin = currentUser?.role === 'admin';
+    const canEdit = currentUser?.role === 'admin' || currentUser?.role === 'staff';
 
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -48,7 +48,7 @@ const AdminMenuUpdate = () => {
     };
 
     const handleFileUpload = async (e) => {
-        if (!isAdmin) return;
+        if (!canEdit) return;
         const file = e.target.files[0];
         if (!file) return;
         setIsUploading(true);
@@ -80,7 +80,7 @@ const AdminMenuUpdate = () => {
     };
 
     const handleExportAll = async () => {
-        if (!isAdmin) return;
+        if (!canEdit) return;
         if (uploadHistory.length === 0) return alert("No PDFs to export");
         const zip = new JSZip();
         uploadHistory.forEach((record, index) => {
@@ -172,14 +172,14 @@ const AdminMenuUpdate = () => {
     };
 
     const handleEditClick = (block) => {
-        if (!isAdmin) return;
+        if (!canEdit) return;
         const items = menuForSelectedDate[block.id];
         setEditValue(convertItemsToText(items, block.isCombo));
         setEditingBlock(block.id);
     };
 
     const handleSave = async (block) => {
-        if (!isAdmin) return;
+        if (!canEdit) return;
         let newItemsArray = [];
         
         if (block.isCombo) {
@@ -242,7 +242,7 @@ const AdminMenuUpdate = () => {
                     <CalendarDays size={28} color="var(--primary)" />
                     <h1 style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>Menu Update</h1>
                 </div>
-                {isAdmin && (
+                {canEdit && (
                     <label className="btn btn-primary hover-grow" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: isUploading ? 'not-allowed' : 'pointer', opacity: isUploading ? 0.7 : 1 }}>
                         <Upload size={18} />
                         {isUploading ? 'Parsing...' : 'Bulk Upload PDF'}
@@ -281,7 +281,7 @@ const AdminMenuUpdate = () => {
                                         <div key={block.id} className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', background: '#f8fafc', boxShadow: 'none' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                                                 <h3 style={{ margin: 0, color: 'var(--primary)', fontWeight: '700', fontSize: '1.1rem' }}>{block.title}</h3>
-                                                {isAdmin && !isEditing && (
+                                                {canEdit && !isEditing && (
                                                     <button onClick={() => handleEditClick(block)} className="btn btn-outline" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', background: '#fff' }}>Edit</button>
                                                 )}
                                             </div>
@@ -332,7 +332,7 @@ const AdminMenuUpdate = () => {
             <div className="glass-card" style={{ padding: '2rem', marginTop: '3rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem' }}>
                     <h2 style={{ fontSize: '1.25rem', color: 'var(--text-main)', margin: 0, fontWeight: '700' }}>Uploaded PDF History</h2>
-                    {isAdmin && (
+                    {canEdit && (
                         <button onClick={handleExportAll} disabled={uploadHistory.length === 0} className="btn btn-outline hover-grow" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: uploadHistory.length === 0 ? 0.5 : 1, cursor: uploadHistory.length === 0 ? 'not-allowed' : 'pointer' }}>
                             <Archive size={16} /> Export ZIP
                         </button>

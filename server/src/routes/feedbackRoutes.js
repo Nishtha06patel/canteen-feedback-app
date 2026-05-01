@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post('/', verifyToken, submitFeedback);
 router.get('/', verifyToken, requireStaffOrAdmin, getFeedbacks);
-router.put('/:id/status', verifyToken, requireAdmin, updateFeedbackStatus);
+router.put('/:id/status', verifyToken, requireStaffOrAdmin, updateFeedbackStatus);
 
 export default router;
