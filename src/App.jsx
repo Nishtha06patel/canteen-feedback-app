@@ -16,14 +16,14 @@ import StaffDashboard from './pages/StaffDashboard';
 import NavBar from './components/NavBar';
 import Sidebar from './components/Sidebar';
 
-const ProtectedRoute = ({ children, roleRequired }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
     const { currentUser } = useAppContext();
     if (!currentUser) {
         return <Navigate to="/login" replace />;
     }
-    if (roleRequired && currentUser.role !== roleRequired) {
+    if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
         if (currentUser.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-        if (currentUser.role === 'staff') return <Navigate to="/staff/dashboard" replace />;
+        if (currentUser.role === 'staff') return <Navigate to="/admin/dashboard" replace />;
         return <Navigate to="/user/dashboard" replace />;
     }
     return children;
@@ -31,66 +31,55 @@ const ProtectedRoute = ({ children, roleRequired }) => {
 
 const AppContent = () => {
     const { currentUser } = useAppContext();
+    const isStaffOrAdmin = currentUser?.role === 'admin' || currentUser?.role === 'staff';
+
     return (
         <Router>
             <div className="app-container">
                 <NavBar />
                 <div className="main-content">
-                    {currentUser?.role === 'admin' && <Sidebar />}
+                    {isStaffOrAdmin && <Sidebar />}
                     <main className="page-content">
                         <Routes>
                             <Route path="/" element={
                                 currentUser 
-                                    ? <Navigate to={
-                                        currentUser.role === 'admin' 
-                                            ? "/admin/dashboard" 
-                                            : currentUser.role === 'staff' 
-                                                ? "/staff/dashboard" 
-                                                : "/user/dashboard"
-                                      } replace /> 
+                                    ? <Navigate to={isStaffOrAdmin ? "/admin/dashboard" : "/user/dashboard"} replace /> 
                                     : <Landing />
                             } />
                             <Route path="/login" element={
                                 currentUser 
-                                    ? <Navigate to={
-                                        currentUser.role === 'admin' 
-                                            ? "/admin/dashboard" 
-                                            : currentUser.role === 'staff' 
-                                                ? "/staff/dashboard" 
-                                                : "/user/dashboard"
-                                      } replace /> 
+                                    ? <Navigate to={isStaffOrAdmin ? "/admin/dashboard" : "/user/dashboard"} replace /> 
                                     : <Login />
                             } />
-                            <Route path="/forgot-password" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <ForgotPassword />} />
-                            <Route path="/signup" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <Signup />} />
-                            <Route path="/admin/forgot-password" element={currentUser ? <Navigate to={currentUser.role === 'admin' ? "/admin/dashboard" : "/user/dashboard"} replace /> : <AdminForgotPassword />} />
+                            <Route path="/forgot-password" element={currentUser ? <Navigate to={isStaffOrAdmin ? "/admin/dashboard" : "/user/dashboard"} replace /> : <ForgotPassword />} />
+                            <Route path="/signup" element={currentUser ? <Navigate to={isStaffOrAdmin ? "/admin/dashboard" : "/user/dashboard"} replace /> : <Signup />} />
+                            <Route path="/admin/forgot-password" element={currentUser ? <Navigate to={isStaffOrAdmin ? "/admin/dashboard" : "/user/dashboard"} replace /> : <AdminForgotPassword />} />
+                            
                             <Route path="/user/dashboard" element={
-                                <ProtectedRoute roleRequired="user">
+                                <ProtectedRoute allowedRoles={['user']}>
                                     <UserDashboard />
                                 </ProtectedRoute>
                             } />
-                            <Route path="/staff/dashboard" element={
-                                <ProtectedRoute roleRequired="staff">
-                                    <StaffDashboard />
-                                </ProtectedRoute>
-                            } />
+                            
+                            <Route path="/staff/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+                            
                             <Route path="/admin/dashboard" element={
-                                <ProtectedRoute roleRequired="admin">
+                                <ProtectedRoute allowedRoles={['admin', 'staff']}>
                                     <AdminDashboard />
                                 </ProtectedRoute>
                             } />
                             <Route path="/admin/users" element={
-                                <ProtectedRoute roleRequired="admin">
+                                <ProtectedRoute allowedRoles={['admin', 'staff']}>
                                     <AdminUsers />
                                 </ProtectedRoute>
                             } />
                             <Route path="/admin/menu-update" element={
-                                <ProtectedRoute roleRequired="admin">
+                                <ProtectedRoute allowedRoles={['admin', 'staff']}>
                                     <AdminMenuUpdate />
                                 </ProtectedRoute>
                             } />
                             <Route path="/admin/app-admin" element={
-                                <ProtectedRoute roleRequired="admin">
+                                <ProtectedRoute allowedRoles={['admin']}>
                                     <AppAdmin />
                                 </ProtectedRoute>
                             } />

@@ -192,6 +192,16 @@ export const AppProvider = ({ children }) => {
         }
     };
 
+    const addUser = async (email, password, role = 'user') => {
+        try {
+            await api.post('/users', { email, password, role });
+            await fetchUsers(); // Refresh user list
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to add user');
+        }
+    };
+
     const deleteUser = async (email) => {
         try {
             await api.delete(`/users/${email}`);
@@ -259,7 +269,7 @@ export const AppProvider = ({ children }) => {
         <AppContext.Provider value={{ 
             currentUser, feedbacks, theme, menuOverrides, registeredUsers, admins,
             toggleTheme, registerUser, loginUser, loginAdmin, logout, addFeedback, updateFeedbackStatus,
-            getMenuForDate, updateMenuForDate, deleteUser, blockUser, unblockUser, addAdminAccount, deleteAdminEmail,
+            getMenuForDate, updateMenuForDate, addUser, deleteUser, blockUser, unblockUser, addAdminAccount, deleteAdminEmail,
             resetPassword, resetAdminPassword
         }}>
             {children}
