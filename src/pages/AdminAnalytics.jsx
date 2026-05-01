@@ -36,10 +36,13 @@ const AdminAnalytics = () => {
     });
 
     // Format type distribution for PieChart
-    const typeData = typeDistribution.map(d => ({
-        name: d.type.charAt(0).toUpperCase() + d.type.slice(1),
-        value: parseInt(d.count)
-    }));
+    const typeData = typeDistribution.map(d => {
+        const typeName = d.type || 'unknown';
+        return {
+            name: typeName.charAt(0).toUpperCase() + typeName.slice(1),
+            value: parseInt(d.count || 0)
+        };
+    });
 
     // COLORS for charts
     const COLORS = ['#6236ff', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
@@ -66,25 +69,25 @@ const AdminAnalytics = () => {
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
                 <StatCard 
                     title="Total Feedback" 
-                    value={summary.total_count} 
+                    value={summary?.total_count || 0} 
                     icon={<MessageSquare size={24} />} 
                     color="#6236ff" 
                 />
                 <StatCard 
                     title="Average Rating" 
-                    value={parseFloat(summary.avg_rating || 0).toFixed(1)} 
+                    value={parseFloat(summary?.avg_rating || 0).toFixed(1)} 
                     icon={<Star size={24} />} 
                     color="#f59e0b" 
                 />
                 <StatCard 
                     title="Complaints" 
-                    value={summary.complaint_count} 
+                    value={summary?.complaint_count || 0} 
                     icon={<AlertCircle size={24} />} 
                     color="#ef4444" 
                 />
                 <StatCard 
                     title="Praise" 
-                    value={summary.praise_count} 
+                    value={summary?.praise_count || 0} 
                     icon={<ThumbsUp size={24} />} 
                     color="#10b981" 
                 />
@@ -193,7 +196,7 @@ const AdminAnalytics = () => {
                                         </div>
                                         <div style={{ width: '100%', height: '6px', background: 'var(--border-light)', borderRadius: '3px', overflow: 'hidden' }}>
                                             <div style={{ 
-                                                width: `${(parseInt(item.count) / parseInt(topItems[0].count)) * 100}%`, 
+                                                width: `${topItems[0]?.count ? (parseInt(item.count) / parseInt(topItems[0].count)) * 100 : 0}%`, 
                                                 height: '100%', background: 'var(--primary)', borderRadius: '3px' 
                                             }}></div>
                                         </div>

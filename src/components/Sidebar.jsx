@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MessageSquare, Users, CalendarDays, Settings, BarChart3 } from 'lucide-react';
+import { MessageSquare, Users, CalendarDays, Settings, BarChart } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const Sidebar = () => {
@@ -9,7 +9,7 @@ const Sidebar = () => {
 
     const menuItems = [
         { path: '/admin/dashboard', label: 'Feedbacks', icon: <MessageSquare size={20} /> },
-        { path: '/admin/analytics', label: 'Analytics', icon: <BarChart3 size={20} /> },
+        { path: '/admin/analytics', label: 'Analytics', icon: <BarChart size={20} /> },
         { path: '/admin/users', label: 'Users', icon: <Users size={20} /> },
         { path: '/admin/menu-update', label: 'Menu Update', icon: <CalendarDays size={20} /> },
         { path: '/admin/app-admin', label: 'App Admin', icon: <Settings size={20} />, adminOnly: true }
