@@ -127,6 +127,16 @@ export const AppProvider = ({ children }) => {
         }
     };
 
+    const updateFeedbackStatus = async (id, status) => {
+        try {
+            await api.put(`/feedback/${id}/status`, { status });
+            await fetchFeedbacks(); // Refresh the feedbacks list
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to update status');
+        }
+    };
+
     const getMenuForDate = (dateOrStr) => {
         let dateObj;
         if (typeof dateOrStr === 'string') {
@@ -211,7 +221,7 @@ export const AppProvider = ({ children }) => {
     return (
         <AppContext.Provider value={{ 
             currentUser, feedbacks, theme, menuOverrides, registeredUsers, admins,
-            toggleTheme, registerUser, loginUser, loginAdmin, logout, addFeedback,
+            toggleTheme, registerUser, loginUser, loginAdmin, logout, addFeedback, updateFeedbackStatus,
             getMenuForDate, updateMenuForDate, deleteUser, addAdminAccount, deleteAdminEmail,
             resetPassword, resetAdminPassword
         }}>

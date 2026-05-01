@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import { LogOut, Clock, User, Sun, Moon } from 'lucide-react';
+import { LogOut, User, Sun, Moon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const NavBar = () => {
     const { currentUser, logout, theme, toggleTheme } = useAppContext();
     const location = useLocation();
-    const [time, setTime] = useState(new Date());
-
-    useEffect(() => {
-        const timer = setInterval(() => setTime(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
 
 
     return (
@@ -30,23 +24,32 @@ const NavBar = () => {
                 <img 
                     src="/logo.jpg" 
                     alt="IAR Logo" 
-                    style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
+                    style={{ height: '45px', width: 'auto', objectFit: 'contain' }} 
                 />
-                <div>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.5px' }}>Canteen Feedback</h2>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, fontWeight: '500' }}>Institute of Advanced Research</p>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <h2 style={{ fontSize: '1.35rem', fontWeight: '500', color: '#7a003c', margin: 0, letterSpacing: '0.5px', fontFamily: 'Georgia, serif' }}>Institute of Advanced Research</h2>
+                    <p style={{ fontSize: '0.9rem', color: '#b30059', margin: 0, fontStyle: 'italic', fontWeight: '600', fontFamily: 'Georgia, serif' }}>The University for Innovation</p>
                 </div>
             </div>
 
+            {/* Center: App Title */}
+            <div style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                color: 'var(--text-main)',
+                fontSize: '1.25rem',
+                fontWeight: '800',
+                letterSpacing: '1px'
+            }}>
+                CANTEEN FEEDBACK
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
-                    <Clock size={16} />
-                    <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: '600', fontSize: '0.9rem' }}>
-                        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                    </span>
-                </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', borderLeft: '1px solid var(--border-light)', paddingLeft: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                     {currentUser ? (
                         <>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

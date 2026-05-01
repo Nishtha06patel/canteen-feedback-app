@@ -16,6 +16,10 @@
   --warning-bg: #fef3c7;
   --highlight-cyan: #6236ff; /* Reused for text highlights */
   --sidebar-width: 260px;
+  --bg-overlay: rgba(255, 255, 255, 0.85);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --toggle-bg: #f1f5f9;
+  --toggle-active: #ffffff;
 }
 
 [data-theme='dark'] {
@@ -29,6 +33,10 @@
   --highlight-cyan: #818cf8;
   --success-bg: rgba(16, 185, 129, 0.1);
   --warning-bg: rgba(245, 158, 11, 0.1);
+  --bg-overlay: rgba(15, 23, 42, 0.85);
+  --glass-bg: rgba(30, 41, 59, 0.95);
+  --toggle-bg: #0f172a;
+  --toggle-active: #1e293b;
 }
 
 * {

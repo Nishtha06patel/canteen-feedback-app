@@ -4,8 +4,10 @@ import { Download, MoreVertical, Star } from 'lucide-react';
 import { format } from 'date-fns';
 
 const AdminDashboard = () => {
-    const { feedbacks, registeredUsers } = useAppContext();
+    const { feedbacks, registeredUsers, updateFeedbackStatus } = useAppContext();
     const [filter, setFilter] = useState('All');
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const [updatingId, setUpdatingId] = useState(null);
 
     const filters = ['All', 'Breakfast', 'Lunch', 'Evening Snack', 'Dinner', 'Full Day', 'Facility'];
 
@@ -26,11 +28,6 @@ const AdminDashboard = () => {
             }
         }
 
-        // Mock status based on ID to keep it consistent
-        const statuses = ['Resolved', 'Pending', 'Open'];
-        const statusIndex = fb.id ? fb.id.toString().charCodeAt(0) % 3 : 0;
-        const status = statuses[statusIndex] || 'Open';
-
         return {
             id: fb.id,
             username: fb.user_email,
@@ -41,7 +38,7 @@ const AdminDashboard = () => {
             feedbackText: details.text || (details.text === '' ? '' : fb.message),
             photoBase64: details.photoBase64 || null,
             photoName: details.photoName || null,
-            status: status
+            status: fb.status || 'Open' // Use real status from DB, fallback to Open
         };
     });
 
@@ -57,6 +54,18 @@ const AdminDashboard = () => {
         if (filter === 'Facility') return fb.mealType === 'Facility';
         return true;
     });
+
+    const handleStatusChange = async (id, newStatus) => {
+        setUpdatingId(id);
+        try {
+            await updateFeedbackStatus(id, newStatus);
+            setOpenDropdownId(null);
+        } catch (error) {
+            alert(error.message || 'Failed to update status');
+        } finally {
+            setUpdatingId(null);
+        }
+    };
 
     const handleExportPDF = async () => {
         if (filteredFeedbacks.length === 0) {
@@ -210,14 +219,63 @@ const AdminDashboard = () => {
                                     <div style={{ fontWeight: '700', fontSize: '1.05rem', color: 'var(--text-main)' }}>{fb.username}</div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                         <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                                            {format(new Date(fb.timestamp), 'dd MMM yyyy')}
+                                            {format(new Date(fb.timestamp), 'dd MMM yyyy, hh:mm a')}
                                         </span>
                                         <span className={`status-pill status-${fb.status.toLowerCase()}`}>
                                             {fb.status}
                                         </span>
-                                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0.2rem' }}>
-                                            <MoreVertical size={18} />
-                                        </button>
+                                        <div style={{ position: 'relative' }}>
+                                            <button 
+                                                onClick={() => setOpenDropdownId(openDropdownId === fb.id ? null : fb.id)}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0.2rem' }}
+                                                disabled={updatingId === fb.id}
+                                            >
+                                                <MoreVertical size={18} />
+                                            </button>
+                                            
+                                            {openDropdownId === fb.id && (
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    top: '100%',
+                                                    right: 0,
+                                                    background: 'var(--bg-card)',
+                                                    border: '1px solid var(--border-light)',
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                                    zIndex: 10,
+                                                    minWidth: '120px',
+                                                    overflow: 'hidden',
+                                                    display: 'flex',
+                                                    flexDirection: 'column'
+                                                }}>
+                                                    {['Open', 'Pending', 'Resolved'].map(s => (
+                                                        <button
+                                                            key={s}
+                                                            onClick={() => handleStatusChange(fb.id, s)}
+                                                            style={{
+                                                                padding: '0.75rem 1rem',
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                textAlign: 'left',
+                                                                cursor: 'pointer',
+                                                                color: fb.status === s ? 'var(--primary)' : 'var(--text-main)',
+                                                                fontWeight: fb.status === s ? '700' : '500',
+                                                                borderBottom: s !== 'Resolved' ? '1px solid var(--border-light)' : 'none',
+                                                                transition: 'background 0.2s',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'space-between'
+                                                            }}
+                                                            onMouseEnter={(e) => e.target.style.background = 'var(--bg-main)'}
+                                                            onMouseLeave={(e) => e.target.style.background = 'none'}
+                                                        >
+                                                            {s}
+                                                            {updatingId === fb.id && s === fb.status && <span style={{ fontSize: '0.75rem' }}>...</span>}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 

@@ -19,8 +19,17 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'Open',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Safely add status column to existing feedbacks table if it doesn't exist
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'feedbacks' AND column_name = 'status') THEN
+        ALTER TABLE feedbacks ADD COLUMN status VARCHAR(20) DEFAULT 'Open';
+    END IF;
+END $$;
 
 -- Menu Overrides Table
 CREATE TABLE IF NOT EXISTS menu_overrides (

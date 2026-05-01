@@ -106,7 +106,7 @@ const Signup = () => {
             alignItems: 'center', 
             justifyContent: 'center', 
             padding: '2rem',
-            background: 'linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url("https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80")',
+            background: 'linear-gradient(var(--bg-overlay), var(--bg-overlay)), url("/campus-bg.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             minHeight: 'calc(100vh - 73px)'
@@ -116,7 +116,7 @@ const Signup = () => {
                 maxWidth: '400px', 
                 padding: '3rem 2rem', 
                 textAlign: 'center',
-                background: 'rgba(255, 255, 255, 0.95)',
+                background: 'var(--glass-bg)',
                 backdropFilter: 'blur(20px)'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
@@ -127,18 +127,18 @@ const Signup = () => {
                 
                 {/* Role Switcher */}
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                     <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: '30px', padding: '4px' }}>
+                     <div style={{ display: 'flex', background: 'var(--toggle-bg)', borderRadius: '30px', padding: '4px' }}>
                         <button
                             type="button"
                             onClick={() => { setRole('user'); setError(''); setOtpValues(['', '', '', '']); setOtpSent(false); }}
-                            style={{ padding: '0.4rem 1.25rem', borderRadius: '30px', border: 'none', background: role === 'user' ? '#fff' : 'transparent', color: role === 'user' ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: '700', fontSize: '0.8rem', boxShadow: role === 'user' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none' }}
+                            style={{ padding: '0.4rem 1.25rem', borderRadius: '30px', border: 'none', background: role === 'user' ? 'var(--toggle-active)' : 'transparent', color: role === 'user' ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: '700', fontSize: '0.8rem', boxShadow: role === 'user' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none' }}
                         >
                             STUDENT
                         </button>
                         <button
                             type="button"
                             onClick={() => { setRole('admin'); setError(''); }}
-                            style={{ padding: '0.4rem 1.25rem', borderRadius: '30px', border: 'none', background: role === 'admin' ? '#fff' : 'transparent', color: role === 'admin' ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: '700', fontSize: '0.8rem', boxShadow: role === 'admin' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none' }}
+                            style={{ padding: '0.4rem 1.25rem', borderRadius: '30px', border: 'none', background: role === 'admin' ? 'var(--toggle-active)' : 'transparent', color: role === 'admin' ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: '700', fontSize: '0.8rem', boxShadow: role === 'admin' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none' }}
                         >
                             ADMIN
                         </button>
