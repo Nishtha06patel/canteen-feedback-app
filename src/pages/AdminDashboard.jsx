@@ -4,7 +4,7 @@ import { Download, MoreVertical, Star } from 'lucide-react';
 import { format } from 'date-fns';
 
 const AdminDashboard = () => {
-    const { feedbacks, registeredUsers, updateFeedbackStatus } = useAppContext();
+    const { currentUser, feedbacks, registeredUsers, updateFeedbackStatus } = useAppContext();
     const [filter, setFilter] = useState('All');
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import api from '../utils/api';
 import { UserPlus, Eye, EyeOff, GraduationCap, Shield, User, Mail, Lock } from 'lucide-react';
 
 const Signup = () => {
