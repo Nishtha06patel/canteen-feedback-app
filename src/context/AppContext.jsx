@@ -34,7 +34,7 @@ export const AppProvider = ({ children }) => {
         if (currentUser) {
             fetchFeedbacks();
             fetchMenus();
-            if (currentUser.role === 'admin') {
+            if (currentUser.role === 'admin' || currentUser.role === 'staff') {
                 fetchUsers();
             }
         }
@@ -74,7 +74,7 @@ export const AppProvider = ({ children }) => {
     };
 
     const fetchFeedbacks = async () => {
-        if (currentUser?.role !== 'admin') return;
+        if (currentUser?.role !== 'admin' && currentUser?.role !== 'staff') return;
         try {
             const { data } = await api.get('/feedback');
             setFeedbacks(data);
