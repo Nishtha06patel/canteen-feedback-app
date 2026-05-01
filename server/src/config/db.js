@@ -37,6 +37,26 @@ const initDatabase = async () => {
         const schema = fs.readFileSync(schemaPath, 'utf8');
         await pool.query(schema);
         console.log('Database schema successfully initialized/verified.');
+
+        // Data Migration: Populate analytics columns from existing JSON messages if they are null
+        await pool.query(`
+            UPDATE feedbacks 
+            SET 
+                rating = CASE 
+                    WHEN rating IS NULL AND message ~ '^\{.*\}$' THEN (message::json->>'stars')::integer 
+                    ELSE rating 
+                END,
+                feedback_type = CASE 
+                    WHEN feedback_type IS NULL AND message ~ '^\{.*\}$' THEN COALESCE(message::json->>'type', 'suggestion') 
+                    ELSE feedback_type 
+                END,
+                item_name = CASE 
+                    WHEN item_name IS NULL AND message ~ '^\{.*\}$' THEN message::json->>'mealItem' 
+                    ELSE item_name 
+                END
+            WHERE rating IS NULL OR feedback_type IS NULL;
+        `).catch(err => console.log('Non-critical: Existing data migration skipped or failed (likely empty or non-JSON messages).'));
+
     } catch (err) {
         console.error('Failed to initialize database schema:', err);
     }
