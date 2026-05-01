@@ -17,6 +17,22 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Safely add blocking columns to users table if they don't exist
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'is_blocked') THEN
+        ALTER TABLE users ADD COLUMN is_blocked BOOLEAN DEFAULT false;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'blocked_at') THEN
+        ALTER TABLE users ADD COLUMN blocked_at TIMESTAMP WITH TIME ZONE;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'blocked_by') THEN
+        ALTER TABLE users ADD COLUMN blocked_by UUID REFERENCES users(id);
+    END IF;
+END $$;
+
 -- Feedbacks Table
 CREATE TABLE IF NOT EXISTS feedbacks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
