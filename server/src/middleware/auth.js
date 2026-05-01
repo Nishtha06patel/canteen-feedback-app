@@ -21,13 +21,20 @@ export const verifyToken = async (req, res, next) => {
         const decoded = jwt.verify(token, secret);
         
         // Fetch user from database
-        const result = await query('SELECT id, email, role FROM users WHERE id = $1', [decoded.id]);
+        const result = await query('SELECT id, email, role, is_blocked FROM users WHERE id = $1', [decoded.id]);
         
         if (result.rows.length === 0) {
             return res.status(401).json({ message: 'User not found' });
         }
 
-        req.user = result.rows[0];
+        const user = result.rows[0];
+
+        // Check if user is blocked
+        if (user.is_blocked) {
+            return res.status(403).json({ message: 'Your account has been blocked by admin. Contact support.' });
+        }
+
+        req.user = user;
         next();
     } catch (error) {
         console.error(error);

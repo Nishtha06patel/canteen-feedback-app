@@ -14,7 +14,7 @@ export const getMe = async (req, res) => {
 export const getAllUsers = async (req, res) => {
     try {
         const { query } = await import('../config/db.js');
-        const result = await query('SELECT id, email, role, created_at FROM users WHERE role = $1 ORDER BY created_at DESC', ['user']);
+        const result = await query('SELECT id, email, role, is_blocked, blocked_at, blocked_by, created_at FROM users WHERE role = $1 ORDER BY created_at DESC', ['user']);
         res.json(result.rows);
     } catch (error) {
         console.error(error);
@@ -86,5 +86,40 @@ export const deleteAdmin = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error deleting admin' });
+    }
+};
+
+export const blockUser = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const adminId = req.user.id;
+        const { query } = await import('../config/db.js');
+        
+        await query(
+            'UPDATE users SET is_blocked = true, blocked_at = CURRENT_TIMESTAMP, blocked_by = $1 WHERE email = $2',
+            [adminId, email.toLowerCase()]
+        );
+        
+        res.json({ message: 'User blocked successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error blocking user' });
+    }
+};
+
+export const unblockUser = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const { query } = await import('../config/db.js');
+        
+        await query(
+            'UPDATE users SET is_blocked = false, blocked_at = NULL, blocked_by = NULL WHERE email = $1',
+            [email.toLowerCase()]
+        );
+        
+        res.json({ message: 'User unblocked successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error unblocking user' });
     }
 };

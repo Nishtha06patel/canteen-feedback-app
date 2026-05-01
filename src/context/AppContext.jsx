@@ -38,6 +38,23 @@ export const AppProvider = ({ children }) => {
                 fetchUsers();
             }
         }
+
+        // Response interceptor to handle blocked users or expired tokens
+        const interceptor = api.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                    // If blocked message is returned, or unauthorized
+                    if (error.response.data?.message?.includes('blocked') || error.response.status === 401) {
+                        logout();
+                        window.location.href = '/login';
+                    }
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => api.interceptors.response.eject(interceptor);
     }, [currentUser]);
 
     const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -184,6 +201,26 @@ export const AppProvider = ({ children }) => {
             throw new Error(error.response?.data?.message || 'Failed to delete user');
         }
     };
+
+    const blockUser = async (email) => {
+        try {
+            await api.post('/users/block', { email });
+            await fetchUsers(); // Refresh the list
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to block user');
+        }
+    };
+
+    const unblockUser = async (email) => {
+        try {
+            await api.post('/users/unblock', { email });
+            await fetchUsers(); // Refresh the list
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to unblock user');
+        }
+    };
     
     const addAdminAccount = async (email, password) => {
         try {
@@ -222,7 +259,7 @@ export const AppProvider = ({ children }) => {
         <AppContext.Provider value={{ 
             currentUser, feedbacks, theme, menuOverrides, registeredUsers, admins,
             toggleTheme, registerUser, loginUser, loginAdmin, logout, addFeedback, updateFeedbackStatus,
-            getMenuForDate, updateMenuForDate, deleteUser, addAdminAccount, deleteAdminEmail,
+            getMenuForDate, updateMenuForDate, deleteUser, blockUser, unblockUser, addAdminAccount, deleteAdminEmail,
             resetPassword, resetAdminPassword
         }}>
             {children}

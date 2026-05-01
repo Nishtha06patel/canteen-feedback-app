@@ -82,13 +82,18 @@ export const login = async (req, res) => {
         }
 
         // Fetch user
-        const result = await query('SELECT id, email, password_hash, role FROM users WHERE email = $1', [email.toLowerCase()]);
+        const result = await query('SELECT id, email, password_hash, role, is_blocked FROM users WHERE email = $1', [email.toLowerCase()]);
         
         if (result.rows.length === 0) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
         const user = result.rows[0];
+
+        // Check if user is blocked
+        if (user.is_blocked) {
+            return res.status(403).json({ message: 'Your account has been blocked by admin. Contact support.' });
+        }
 
         // Ensure role matches what they are trying to log in as
         if (user.role !== role) {
