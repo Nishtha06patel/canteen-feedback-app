@@ -8,14 +8,20 @@ const Sidebar = () => {
     const { currentUser, messages } = useAppContext();
     const [unreadCount, setUnreadCount] = useState(0);
 
-    // Calculate unread count (this is simplified, ideally we'd track 'last seen')
-    // For now, let's just show a dot if there are messages and we aren't on the page
+    // Calculate unread count (only messages from the last 24 hours)
     useEffect(() => {
         if (location.pathname === '/admin/broadcast') {
             setUnreadCount(0);
-        } else if (messages.length > 0 && unreadCount === 0) {
-            // This is a naive implementation; in a real app we'd track IDs
-            setUnreadCount(messages.length);
+        } else {
+            const now = new Date();
+            const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            
+            const freshMessagesCount = messages.filter(msg => {
+                const msgDate = new Date(msg.created_at);
+                return msgDate > oneDayAgo;
+            }).length;
+
+            setUnreadCount(freshMessagesCount);
         }
     }, [messages, location.pathname]);
 
