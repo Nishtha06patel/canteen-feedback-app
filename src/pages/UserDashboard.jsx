@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DAYS_OF_WEEK } from '../mockData';
 import { useAppContext } from '../context/AppContext';
 import { format, startOfWeek, addDays } from 'date-fns';
-import { Camera, Paperclip, X, Image as ImageIcon, Utensils, Sun, Moon, ArrowLeft, Star } from 'lucide-react';
+import { Camera, Paperclip, X, Image as ImageIcon, Utensils, Sun, Moon, ArrowLeft, Star, Clock } from 'lucide-react';
 import { fileToBase64 } from '../utils/db';
 
 const UserDashboard = () => {
