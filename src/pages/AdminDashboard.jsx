@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Download, MoreVertical, Star } from 'lucide-react';
+import { Download, MoreVertical, Star, Bell } from 'lucide-react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
     const { currentUser, feedbacks, registeredUsers, updateFeedbackStatus } = useAppContext();
+    const navigate = useNavigate();
     const [filter, setFilter] = useState('All');
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
@@ -151,13 +153,22 @@ const AdminDashboard = () => {
         <div className="animate-fade-in" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
             <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
                 <h1 style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>Feedback Feed</h1>
-                <button 
-                    onClick={handleExportPDF} 
-                    className="btn btn-outline hover-grow" 
-                    style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', borderRadius: '8px' }}
-                >
-                    <Download size={16} /> Export
-                </button>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button 
+                        onClick={() => navigate('/admin/broadcast')} 
+                        className="btn btn-primary hover-grow" 
+                        style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                        <Bell size={16} /> Broadcast
+                    </button>
+                    <button 
+                        onClick={handleExportPDF} 
+                        className="btn btn-outline hover-grow" 
+                        style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', borderRadius: '8px' }}
+                    >
+                        <Download size={16} /> Export
+                    </button>
+                </div>
             </div>
 
             {/* Filter Pills */}

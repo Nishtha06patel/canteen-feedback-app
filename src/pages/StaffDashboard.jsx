@@ -1,15 +1,26 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Utensils, Clock, CheckCircle } from 'lucide-react';
+import { Utensils, Clock, CheckCircle, Bell } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const StaffDashboard = () => {
     const { currentUser, logout } = useAppContext();
+    const navigate = useNavigate();
 
     return (
         <div className="animate-fade-in" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                <Utensils size={28} color="var(--primary)" />
-                <h1 style={{ fontSize: '1.75rem', fontWeight: '700', margin: 0 }}>Staff Dashboard</h1>
+            <div className="flex-between" style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Utensils size={28} color="var(--primary)" />
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: '700', margin: 0 }}>Staff Dashboard</h1>
+                </div>
+                <button 
+                    onClick={() => navigate('/admin/broadcast')} 
+                    className="btn btn-primary hover-grow" 
+                    style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                    <Bell size={18} /> Send Broadcast
+                </button>
             </div>
 
             <div className="glass-card" style={{ padding: '3rem', textAlign: 'center' }}>
