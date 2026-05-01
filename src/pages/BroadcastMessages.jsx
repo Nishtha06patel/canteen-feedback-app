@@ -7,7 +7,7 @@ const BroadcastMessages = () => {
     const { currentUser, messages, sendBroadcastMessage } = useAppContext();
     const [content, setContent] = useState('');
     const [type, setType] = useState('normal');
-    const [recipientRole, setRecipientRole] = useState(currentUser?.role === 'admin' ? 'staff' : 'user');
+    const [recipientRole, setRecipientRole] = useState(currentUser?.role === 'admin' ? 'staff' : 'admin');
     const [isSending, setIsSending] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -60,10 +60,18 @@ const BroadcastMessages = () => {
                                 className="input-field" 
                                 value={recipientRole} 
                                 onChange={(e) => setRecipientRole(e.target.value)}
-                                disabled={currentUser?.role !== 'admin'}
                             >
-                                {currentUser?.role === 'admin' && <option value="staff">Canteen Staff Only</option>}
-                                <option value="user">All Students</option>
+                                {currentUser?.role === 'admin' ? (
+                                    <>
+                                        <option value="staff">Canteen Staff Only</option>
+                                        <option value="user">All Students</option>
+                                    </>
+                                ) : (
+                                    <>
+                                        <option value="admin">Administrator</option>
+                                        <option value="user">All Students</option>
+                                    </>
+                                )}
                             </select>
                         </div>
 
@@ -129,14 +137,14 @@ const BroadcastMessages = () => {
                                 border: 'none'
                             }}
                         >
-                            <Send size={18} /> {isSending ? 'Sending...' : 'Broadcast Message'}
+                            <Send size={18} /> {isSending ? 'Sending...' : 'Send Announcement'}
                         </button>
                     </form>
                 </div>
 
                 {/* Sent History Panel */}
                 <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Recent Broadcasts</h2>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Announcement History</h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '500px', overflowY: 'auto', paddingRight: '0.5rem' }}>
                         {messages.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>

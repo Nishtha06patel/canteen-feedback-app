@@ -42,9 +42,9 @@ export const sendMessage = async (req, res) => {
             return res.status(400).json({ message: 'Content and recipient role are required' });
         }
 
-        // Role-based validation: Admin can send to anyone, Staff can only send to students
-        if (req.user.role === 'staff' && recipient_role !== 'user') {
-            return res.status(403).json({ message: 'Staff can only send messages to students' });
+        // Role-based validation: Admin can send to anyone, Staff can send to admins or students
+        if (req.user.role === 'staff' && !['admin', 'user'].includes(recipient_role)) {
+            return res.status(403).json({ message: 'Staff can only send messages to the Administrator or Students' });
         }
 
         const result = await query(
