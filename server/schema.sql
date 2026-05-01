@@ -15,6 +15,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
+    full_name VARCHAR(255),
     password_hash VARCHAR(255) NOT NULL,
     role user_role DEFAULT 'user',
     is_blocked BOOLEAN DEFAULT false,
@@ -36,6 +37,10 @@ BEGIN
     
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'blocked_by') THEN
         ALTER TABLE users ADD COLUMN blocked_by UUID REFERENCES users(id);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'full_name') THEN
+        ALTER TABLE users ADD COLUMN full_name VARCHAR(255);
     END IF;
 END $$;
 

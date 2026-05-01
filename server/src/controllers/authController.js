@@ -11,14 +11,18 @@ const generateToken = (id) => {
 
 export const register = async (req, res) => {
     try {
-        const { email, password, role = 'user', secretCode = '' } = req.body;
+        const { email, password, role = 'user', secretCode = '', fullName = '' } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ message: 'Please provide email and password' });
         }
 
-        // Validate role
-        if (role !== 'user' && role !== 'admin' && role !== 'staff') {
+        // Validate role - staff cannot be created via public signup
+        if (role === 'staff') {
+            return res.status(403).json({ message: 'Canteen Staff accounts can only be created by an Admin.' });
+        }
+
+        if (role !== 'user' && role !== 'admin') {
             return res.status(400).json({ message: 'Invalid role provided' });
         }
 
@@ -30,8 +34,8 @@ export const register = async (req, res) => {
             }
         }
 
-        // Validate email domain for students and staff
-        if ((role === 'user' || role === 'staff') && !email.toLowerCase().endsWith('@iar.ac.in')) {
+        // Validate email domain for students
+        if (role === 'user' && !email.toLowerCase().endsWith('@iar.ac.in')) {
             return res.status(400).json({ message: 'Email must belong to @iar.ac.in domain' });
         }
 
@@ -45,10 +49,10 @@ export const register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Insert new user with the specified role
+        // Insert new user with the specified role and name
         const result = await query(
-            'INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) RETURNING id, email, role',
-            [email.toLowerCase(), hashedPassword, role]
+            'INSERT INTO users (email, full_name, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, email, role, full_name',
+            [email.toLowerCase(), fullName, hashedPassword, role]
         );
 
         const user = result.rows[0];

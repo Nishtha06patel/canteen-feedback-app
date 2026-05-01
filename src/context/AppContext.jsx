@@ -99,11 +99,11 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const registerUser = async (email, password, role = 'user', secretCode = '') => {
+    const registerUser = async (email, password, role = 'user', secretCode = '', fullName = '') => {
         try {
-            const { data } = await api.post('/auth/register', { email, password, role, secretCode });
+            const { data } = await api.post('/auth/register', { email, password, role, secretCode, fullName });
             localStorage.setItem('canteen_token', data.token);
-            setCurrentUser({ role: data.role, username: data.email, id: data.id });
+            setCurrentUser({ role: data.role, username: data.full_name || data.email, id: data.id });
             return true;
         } catch (error) {
             console.error("Registration error:", error);
