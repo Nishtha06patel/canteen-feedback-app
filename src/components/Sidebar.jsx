@@ -1,21 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MessageSquare, Users, CalendarDays, Settings } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
 
 const Sidebar = () => {
     const location = useLocation();
-    const { registeredUsers } = useAppContext();
-    const blockedCount = registeredUsers.filter(u => u.is_blocked).length;
 
     const menuItems = [
         { path: '/admin/dashboard', label: 'Feedbacks', icon: <MessageSquare size={20} /> },
-        { 
-            path: '/admin/users', 
-            label: 'Users', 
-            icon: <Users size={20} />,
-            badge: blockedCount > 0 ? blockedCount : null
-        },
+        { path: '/admin/users', label: 'Users', icon: <Users size={20} /> },
         { path: '/admin/menu-update', label: 'Menu Update', icon: <CalendarDays size={20} /> },
         { path: '/admin/app-admin', label: 'App Admin', icon: <Settings size={20} /> }
     ];
@@ -48,28 +40,13 @@ const Sidebar = () => {
                                 color: isActive ? 'var(--primary)' : 'var(--text-main)',
                                 background: isActive ? 'rgba(98, 54, 255, 0.08)' : 'transparent',
                                 fontWeight: isActive ? '600' : '500',
-                                transition: 'all 0.2s ease',
-                                justifyContent: 'space-between'
+                                transition: 'all 0.2s ease'
                             }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ color: isActive ? 'var(--primary)' : 'var(--text-muted)' }}>
-                                    {item.icon}
-                                </div>
-                                {item.label}
+                            <div style={{ color: isActive ? 'var(--primary)' : 'var(--text-muted)' }}>
+                                {item.icon}
                             </div>
-                            {item.badge && (
-                                <span style={{ 
-                                    background: 'var(--danger)', 
-                                    color: 'white', 
-                                    fontSize: '0.7rem', 
-                                    padding: '0.1rem 0.5rem', 
-                                    borderRadius: '10px', 
-                                    fontWeight: '700' 
-                                }}>
-                                    {item.badge}
-                                </span>
-                            )}
+                            {item.label}
                         </Link>
                     );
                 })}
