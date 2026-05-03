@@ -63,10 +63,14 @@ const AppContent = () => {
                                 </ProtectedRoute>
                             } />
                             
-                            <Route path="/staff/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+                            <Route path="/staff/dashboard" element={
+                                <ProtectedRoute allowedRoles={['staff']}>
+                                    <StaffDashboard />
+                                </ProtectedRoute>
+                            } />
                             
                             <Route path="/admin/dashboard" element={
-                                <ProtectedRoute allowedRoles={['admin', 'staff']}>
+                                <ProtectedRoute allowedRoles={['admin']}>
                                     <AdminDashboard />
                                 </ProtectedRoute>
                             } />

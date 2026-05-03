@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Download, MoreVertical, Star, Bell } from 'lucide-react';
-import { format } from 'date-fns';
+import { Download, MoreVertical, Star, Bell, Clock, AlertTriangle } from 'lucide-react';
+import { format, formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
-    const { currentUser, feedbacks, registeredUsers, updateFeedbackStatus } = useAppContext();
+    const { currentUser, feedbacks, registeredUsers, updateFeedbackStatus, messages } = useAppContext();
     const navigate = useNavigate();
     const [filter, setFilter] = useState('All');
     const [openDropdownId, setOpenDropdownId] = useState(null);
@@ -162,6 +162,54 @@ const AdminDashboard = () => {
                         <Download size={16} /> Export
                     </button>
                 </div>
+            </div>
+
+            {/* Announcements Section */}
+            <div style={{ marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700' }}>
+                    <Bell size={20} color="var(--primary)" /> Recent Announcements (Last 24 Hours)
+                </div>
+                
+                {messages && messages.filter(msg => new Date(msg.expires_at) > new Date()).length > 0 ? (
+                    <div className="no-scrollbar" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+                        {messages.filter(msg => new Date(msg.expires_at) > new Date()).map(msg => (
+                            <div key={msg.id} className="glass-card animate-pop-in" style={{ 
+                                minWidth: '300px', 
+                                maxWidth: '300px', 
+                                padding: '1.25rem', 
+                                borderLeft: `4px solid ${msg.type === 'emergency' ? '#ef4444' : msg.type === 'delay' ? '#f59e0b' : 'var(--primary)'}`,
+                                position: 'relative',
+                                background: msg.type === 'emergency' ? 'rgba(239, 68, 68, 0.03)' : 'var(--bg-card)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', alignItems: 'center' }}>
+                                    <span style={{ 
+                                        fontSize: '0.7rem', 
+                                        fontWeight: '800', 
+                                        textTransform: 'uppercase', 
+                                        color: msg.type === 'emergency' ? '#ef4444' : msg.type === 'delay' ? '#f59e0b' : 'var(--primary)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.3rem'
+                                    }}>
+                                        {msg.type === 'emergency' ? <AlertTriangle size={12} /> : msg.type === 'delay' ? <Clock size={12} /> : <Bell size={12} />}
+                                        {msg.type}
+                                    </span>
+                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                                        Expires in {formatDistanceToNow(new Date(msg.expires_at))}
+                                    </span>
+                                </div>
+                                <p style={{ fontSize: '0.875rem', margin: 0, color: 'var(--text-main)', lineHeight: '1.5', fontWeight: '500' }}>{msg.content}</p>
+                                <div style={{ marginTop: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                                    To: <span style={{ textTransform: 'capitalize' }}>{msg.recipient_role === 'user' ? 'Students' : msg.recipient_role}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        No recent announcements at this time.
+                    </div>
+                )}
             </div>
 
             {/* Filter Pills */}

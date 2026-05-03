@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Send, Bell, AlertTriangle, Clock, MessageCircle } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 
 const BroadcastMessages = () => {
     const { currentUser, messages, sendBroadcastMessage, fetchMessages } = useAppContext();

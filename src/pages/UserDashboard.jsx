@@ -134,150 +134,176 @@ const UserDashboard = () => {
         const rawItems = isFacility ? [] : (currentMenuData[block.id] || []);
         
         return (
-            <div className="feedback-modal-wrapper animate-fade-in">
-                <div className="feedback-modal animate-pop-in" style={{ padding: 0 }}>
-                    <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <button onClick={() => setExpandedBlock(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', color: 'var(--primary)' }}>
-                            <ArrowLeft size={24} />
+            <div className="auth-container animate-fade-in" style={{ 
+                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+                zIndex: 2000, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(5px)' 
+            }}>
+                <div className="auth-card-wide animate-pop-in">
+                    {/* Header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ background: 'rgba(98, 54, 255, 0.1)', padding: '0.6rem', borderRadius: '12px' }}>
+                                {block.icon}
+                            </div>
+                            <div>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>Share Your Feedback</h2>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>{block.title} • {block.time}</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setExpandedBlock(null)} style={{ background: 'var(--bg-main)', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}>
+                            <X size={20} />
                         </button>
-                        <h2 style={{ fontSize: '1.25rem', fontWeight: '700', margin: 0, color: 'var(--primary)' }}>Rate This Item</h2>
                     </div>
 
-                    <div className="desktop-grid" style={{ padding: '2rem' }}>
+                    <div className="desktop-grid">
                         {/* Left Column: Item & Rating */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1.5rem' }}>{block.title}</div>
-                            
+                        <div>
                             {!isFacility && (
-                                <div style={{ width: '100%', marginBottom: '1.5rem' }}>
-                                    <label className="input-label" style={{ textAlign: 'left' }}>Select Item</label>
-                                    <select
-                                        className="input-field"
-                                        value={selectedItems[block.id] || ''}
-                                        onChange={(e) => setSelectedItems(prev => ({ ...prev, [block.id]: e.target.value }))}
-                                    >
-                                        {(block.id === 'lunch' || block.id === 'dinner') ? (
-                                            <option value="">Rate Entire Meal (All Items)</option>
-                                        ) : (
-                                            <option value="" disabled hidden>Select an item to rate...</option>
-                                        )}
-                                        {rawItems.map((item, idx) => (
-                                            item.isCombo && item.subItems ? (
-                                                item.subItems.map((sub, sIdx) => (
-                                                    <option key={`sub-${idx}-${sIdx}`} value={sub}>{sub}</option>
-                                                ))
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <label className="input-label" style={{ fontWeight: '700' }}>Which item did you have?</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <select
+                                            className="input-field"
+                                            value={selectedItems[block.id] || ''}
+                                            onChange={(e) => setSelectedItems(prev => ({ ...prev, [block.id]: e.target.value }))}
+                                            style={{ paddingLeft: '1rem', appearance: 'none', cursor: 'pointer' }}
+                                        >
+                                            {(block.id === 'lunch' || block.id === 'dinner') ? (
+                                                <option value="">Rate Entire Meal (All Items)</option>
                                             ) : (
-                                                <option key={idx} value={item.name}>{item.name}</option>
-                                            )
-                                        ))}
-                                    </select>
+                                                <option value="" disabled hidden>Select an item...</option>
+                                            )}
+                                            {rawItems.map((item, idx) => (
+                                                item.isCombo && item.subItems ? (
+                                                    item.subItems.map((sub, sIdx) => (
+                                                        <option key={`sub-${idx}-${sIdx}`} value={sub}>{sub}</option>
+                                                    ))
+                                                ) : (
+                                                    <option key={idx} value={item.name}>{item.name}</option>
+                                                )
+                                            ))}
+                                        </select>
+                                        <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-muted)', display: 'flex' }}>
+                                            <ChevronDown size={18} />
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.75rem', fontWeight: '600', textAlign: 'left', width: '100%' }}>
-                                Category
-                            </div>
-                            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', width: '100%' }}>
-                                {['suggestion', 'praise', 'complaint'].map(t => (
-                                    <button
-                                        key={t}
-                                        onClick={() => setFeedbackTypes(prev => ({ ...prev, [block.id]: t }))}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.5rem',
-                                            borderRadius: '8px',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '700',
-                                            textTransform: 'capitalize',
-                                            cursor: 'pointer',
-                                            border: `1px solid ${feedbackTypes[block.id] === t ? 'var(--primary)' : 'var(--border-light)'}`,
-                                            background: feedbackTypes[block.id] === t ? 'var(--primary)' : 'white',
-                                            color: feedbackTypes[block.id] === t ? 'white' : 'var(--text-muted)',
-                                            transition: 'all 0.2s'
-                                        }}
-                                    >
-                                        {t}
-                                    </button>
-                                ))}
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label className="input-label" style={{ fontWeight: '700' }}>Category</label>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    {['suggestion', 'praise', 'complaint'].map(t => (
+                                        <button
+                                            key={t}
+                                            onClick={() => setFeedbackTypes(prev => ({ ...prev, [block.id]: t }))}
+                                            style={{
+                                                flex: 1,
+                                                padding: '0.6rem 0.4rem',
+                                                borderRadius: '12px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: '700',
+                                                textTransform: 'capitalize',
+                                                cursor: 'pointer',
+                                                border: '1px solid',
+                                                borderColor: feedbackTypes[block.id] === t ? 'var(--primary)' : 'var(--border-light)',
+                                                background: feedbackTypes[block.id] === t ? 'rgba(98, 54, 255, 0.08)' : 'var(--bg-main)',
+                                                color: feedbackTypes[block.id] === t ? 'var(--primary)' : 'var(--text-muted)',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            {t}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.75rem', fontWeight: '600', textAlign: 'left', width: '100%' }}>
-                                Star Rating
-                            </div>
-                            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', justifyContent: 'center' }}>
-                                {[1, 2, 3, 4, 5].map(star => {
-                                    const active = star <= (ratings[block.id] || 0);
-                                    return (
-                                        <button
-                                            key={star}
-                                            type="button"
-                                            onClick={() => setRatings(prev => ({ ...prev, [block.id]: star }))}
-                                            style={{
-                                                background: 'none', border: 'none', cursor: 'pointer', padding: '0.2rem',
-                                                color: active ? '#f59e0b' : '#cbd5e1',
-                                                transition: 'transform 0.1s ease',
-                                            }}
-                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                        >
-                                            <Star size={32} fill={active ? '#f59e0b' : 'none'} strokeWidth={active ? 0 : 1.5} />
-                                        </button>
-                                    );
-                                })}
+                            <div style={{ textAlign: 'center', background: 'var(--bg-main)', padding: '1.5rem', borderRadius: '20px', border: '1px solid var(--border-light)' }}>
+                                <label className="input-label" style={{ fontWeight: '700', marginBottom: '1rem', display: 'block' }}>Rate Your Experience</label>
+                                <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center' }}>
+                                    {[1, 2, 3, 4, 5].map(star => {
+                                        const active = star <= (ratings[block.id] || 0);
+                                        return (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onClick={() => setRatings(prev => ({ ...prev, [block.id]: star }))}
+                                                style={{
+                                                    background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem',
+                                                    color: active ? '#f59e0b' : '#cbd5e1',
+                                                    transition: 'all 0.2s ease',
+                                                }}
+                                                className="hover-grow"
+                                            >
+                                                <Star size={36} fill={active ? '#f59e0b' : 'none'} strokeWidth={active ? 0 : 1.5} />
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.75rem', fontWeight: '600' }}>
+                                    {ratings[block.id] === 1 ? 'Poor 😞' : ratings[block.id] === 2 ? 'Fair 😐' : ratings[block.id] === 3 ? 'Good 🙂' : ratings[block.id] === 4 ? 'Very Good 😃' : ratings[block.id] === 5 ? 'Excellent! 😍' : 'Tap to rate'}
+                                </p>
                             </div>
                         </div>
 
                         {/* Right Column: Text & Photos */}
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ width: '100%', textAlign: 'left', marginBottom: '1.25rem' }}>
-                                <label className="input-label" style={{ fontWeight: '600', color: 'var(--text-main)' }}>Your Feedback</label>
+                        <div>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label className="input-label" style={{ fontWeight: '700' }}>Detailed Feedback</label>
                                 <textarea
                                     className="input-field"
-                                    placeholder="Tell us more about your experience..."
+                                    placeholder="Tell us what you liked or how we can improve..."
                                     value={texts[block.id] || ''}
                                     onChange={(e) => setTexts(prev => ({ ...prev, [block.id]: e.target.value }))}
-                                    style={{ height: '120px', resize: 'none' }}
+                                    style={{ height: '140px', resize: 'none', padding: '1rem' }}
                                     maxLength={250}
                                 />
-                                <div style={{ textAlign: 'right', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                                <div style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem', fontWeight: '600' }}>
                                     {(texts[block.id] || '').length}/250
                                 </div>
                             </div>
 
-                            <div style={{ width: '100%', marginBottom: '1.5rem' }}>
-                                <label className="input-label" style={{ fontWeight: '600', color: 'var(--text-main)' }}>Add Evidence (Photo)</label>
+                            <div style={{ marginBottom: '2rem' }}>
+                                <label className="input-label" style={{ fontWeight: '700' }}>Attach Photo Evidence (Optional)</label>
                                 {!photos[block.id] ? (
                                     <div style={{ display: 'flex', gap: '0.75rem' }}>
                                         <button 
                                             type="button"
                                             onClick={() => document.getElementById(`photo-camera-${block.id}`).click()} 
                                             className="btn btn-outline"
-                                            style={{ flex: 1, padding: '0.6rem', fontSize: '0.85rem' }}
+                                            style={{ flex: 1, padding: '0.8rem', borderRadius: '12px' }}
                                         >
-                                            <Camera size={16} /> Camera
+                                            <Camera size={18} /> Camera
                                         </button>
                                         <button 
                                             type="button"
                                             onClick={() => document.getElementById(`photo-gallery-${block.id}`).click()} 
                                             className="btn btn-outline"
-                                            style={{ flex: 1, padding: '0.6rem', fontSize: '0.85rem' }}
+                                            style={{ flex: 1, padding: '0.8rem', borderRadius: '12px' }}
                                         >
-                                            <ImageIcon size={16} /> Gallery
+                                            <ImageIcon size={18} /> Gallery
                                         </button>
                                     </div>
                                 ) : (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--bg-main)', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-                                        <Paperclip size={14} color="var(--primary)" />
-                                        <span style={{ fontSize: '0.8rem', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: '500' }}>{photos[block.id].name}</span>
-                                        <button type="button" onClick={() => setPhotos(prev => ({ ...prev, [block.id]: null }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', display: 'flex' }}><X size={16} /></button>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--bg-main)', padding: '0.8rem 1rem', borderRadius: '12px', border: '1px solid var(--primary)' }}>
+                                        <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <ImageIcon size={20} color="white" />
+                                        </div>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ fontSize: '0.85rem', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{photos[block.id].name}</div>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Ready to upload</div>
+                                        </div>
+                                        <button type="button" onClick={() => setPhotos(prev => ({ ...prev, [block.id]: null }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', padding: '0.4rem' }}>
+                                            <X size={18} />
+                                        </button>
                                     </div>
                                 )}
                                 <input type="file" id={`photo-camera-${block.id}`} accept="image/*" capture="environment" style={{ display: 'none' }} onChange={(e) => { if (e.target.files && e.target.files[0]) setPhotos(prev => ({ ...prev, [block.id]: e.target.files[0] })); }} />
                                 <input type="file" id={`photo-gallery-${block.id}`} accept="image/*" style={{ display: 'none' }} onChange={(e) => { if (e.target.files && e.target.files[0]) setPhotos(prev => ({ ...prev, [block.id]: e.target.files[0] })); }} />
                             </div>
 
-                            <button className="btn btn-primary" onClick={() => handleCardSubmit(block.id)} style={{ width: '100%', padding: '0.9rem', fontSize: '1rem' }}>
-                                Submit Feedback
+                            <button className="btn btn-primary" onClick={() => handleCardSubmit(block.id)} style={{ width: '100%', padding: '1rem', fontSize: '1rem', borderRadius: '14px', boxShadow: '0 10px 20px rgba(98, 54, 255, 0.2)' }}>
+                                Submit Professional Feedback
                             </button>
                         </div>
                     </div>
