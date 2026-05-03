@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DAYS_OF_WEEK } from '../mockData';
 import { useAppContext } from '../context/AppContext';
-import { format, startOfWeek, addDays } from 'date-fns';
+import { format, startOfWeek, addDays, formatDistanceToNow } from 'date-fns';
 import { Camera, Paperclip, X, Image as ImageIcon, Utensils, Sun, Moon, ArrowLeft, Star, Clock, Bell, AlertTriangle } from 'lucide-react';
 import { fileToBase64 } from '../utils/db';
 import MealSelection from '../components/MealSelection';
@@ -297,13 +297,21 @@ const UserDashboard = () => {
             </div>
 
             {/* Announcements Section */}
-            {messages.length > 0 && (
+            {messages.filter(msg => {
+                const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
+                return isRecent || (msg.expires_at && isNotExpired);
+            }).length > 0 && (
                 <div style={{ marginBottom: '2.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700' }}>
-                        <Bell size={20} color="var(--primary)" /> Recent Announcements
+                        <Bell size={20} color="var(--primary)" /> Recent Announcements (Last 24 Hours)
                     </div>
                     <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
-                        {messages.map(msg => (
+                        {messages.filter(msg => {
+                            const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+                            const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
+                            return isRecent || (msg.expires_at && isNotExpired);
+                        }).map(msg => (
                             <div key={msg.id} className="glass-card" style={{ 
                                 minWidth: '300px', 
                                 maxWidth: '300px', 
@@ -325,7 +333,7 @@ const UserDashboard = () => {
                                         {msg.type === 'emergency' ? <AlertTriangle size={12} /> : msg.type === 'delay' ? <Clock size={12} /> : <Bell size={12} />}
                                         {msg.type}
                                     </span>
-                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{format(new Date(msg.created_at), 'hh:mm a')}</span>
+                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}</span>
                                 </div>
                                 <p style={{ fontSize: '0.875rem', margin: 0, color: 'var(--text-main)', lineHeight: '1.5', fontWeight: '500' }}>{msg.content}</p>
                             </div>

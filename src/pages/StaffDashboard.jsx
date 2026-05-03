@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import api from '../utils/api';
-import { Utensils, Clock, CheckCircle, Bell, Moon, Sun } from 'lucide-react';
+import { Utensils, Clock, CheckCircle, Bell, Moon, Sun, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 
 const StaffDashboard = () => {
-    const { currentUser, logout } = useAppContext();
+    const { currentUser, logout, messages } = useAppContext();
     const navigate = useNavigate();
     const [mealSummary, setMealSummary] = useState({ dinnerToday: 0, lunchTomorrow: 0 });
 
@@ -54,6 +55,52 @@ const StaffDashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Announcements Section */}
+            {messages.filter(msg => {
+                const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
+                return isRecent || (msg.expires_at && isNotExpired);
+            }).length > 0 && (
+                <div style={{ marginBottom: '2.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700' }}>
+                        <Bell size={20} color="var(--primary)" /> Recent Announcements (Last 24 Hours)
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
+                        {messages.filter(msg => {
+                            const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+                            const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
+                            return isRecent || (msg.expires_at && isNotExpired);
+                        }).map(msg => (
+                            <div key={msg.id} className="glass-card" style={{ 
+                                minWidth: '300px', 
+                                maxWidth: '300px', 
+                                padding: '1.25rem', 
+                                borderLeft: `4px solid ${msg.type === 'emergency' ? '#ef4444' : msg.type === 'delay' ? '#f59e0b' : 'var(--primary)'}`,
+                                position: 'relative',
+                                background: msg.type === 'emergency' ? 'rgba(239, 68, 68, 0.03)' : 'var(--bg-card)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', alignItems: 'center' }}>
+                                    <span style={{ 
+                                        fontSize: '0.7rem', 
+                                        fontWeight: '800', 
+                                        textTransform: 'uppercase', 
+                                        color: msg.type === 'emergency' ? '#ef4444' : msg.type === 'delay' ? '#f59e0b' : 'var(--primary)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.3rem'
+                                    }}>
+                                        {msg.type === 'emergency' ? <AlertTriangle size={12} /> : msg.type === 'delay' ? <Clock size={12} /> : <Bell size={12} />}
+                                        {msg.type}
+                                    </span>
+                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}</span>
+                                </div>
+                                <p style={{ fontSize: '0.875rem', margin: 0, color: 'var(--text-main)', lineHeight: '1.5', fontWeight: '500' }}>{msg.content}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="glass-card" style={{ padding: '3rem', textAlign: 'center' }}>
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>

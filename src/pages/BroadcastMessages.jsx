@@ -9,6 +9,7 @@ const BroadcastMessages = () => {
     const [type, setType] = useState('normal');
     const [recipientRole, setRecipientRole] = useState(currentUser?.role === 'admin' ? 'staff' : 'admin');
     const [isSending, setIsSending] = useState(false);
+    const [expiryOption, setExpiryOption] = useState('24'); // Default 24 hours
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,7 +17,13 @@ const BroadcastMessages = () => {
 
         setIsSending(true);
         try {
-            await sendBroadcastMessage(content, type, recipientRole);
+            let expiresAt = null;
+            if (expiryOption !== 'never') {
+                const hours = parseInt(expiryOption);
+                expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+            }
+
+            await sendBroadcastMessage(content, type, recipientRole, expiresAt);
             setContent('');
             setType('normal');
         } catch (error) {
@@ -104,6 +111,26 @@ const BroadcastMessages = () => {
                                         {getTypeIcon(t)} {t}
                                     </button>
                                 ))}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label className="input-label">Expiry Duration</label>
+                            <select 
+                                className="input-field" 
+                                value={expiryOption} 
+                                onChange={(e) => setExpiryOption(e.target.value)}
+                            >
+                                <option value="1">1 Hour (Quick Alert)</option>
+                                <option value="3">3 Hours</option>
+                                <option value="6">6 Hours</option>
+                                <option value="12">12 Hours</option>
+                                <option value="24">24 Hours (Standard)</option>
+                                <option value="48">48 Hours (Long Term)</option>
+                                <option value="never">No Expiry (Always show in 24h window)</option>
+                            </select>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                                Messages expire automatically after this duration.
                             </div>
                         </div>
 

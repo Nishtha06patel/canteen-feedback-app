@@ -178,13 +178,16 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const sendBroadcastMessage = async (content, type, recipientRole) => {
+    const sendBroadcastMessage = async (content, type, recipientRole, expiresAt) => {
         try {
-            const { data } = await api.post('/messages', { content, type, recipient_role: recipientRole });
+            const { data } = await api.post('/messages', { 
+                content, 
+                type, 
+                recipient_role: recipientRole,
+                expiresAt 
+            });
             // The socket emission is handled by backend, but we might want to update local state if we are the sender
             // But usually the backend emits to the sender's room too if they belong to it, or we manually add it.
-            // In our case, admin sends to staff, so admin won't see it in their "student" or "staff" room.
-            // So we add it manually to our list.
             setMessages(prev => [data, ...prev]);
             return true;
         } catch (error) {

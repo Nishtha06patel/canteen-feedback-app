@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS messages (
     recipient_role VARCHAR(20) NOT NULL, -- 'staff' or 'student'
     content TEXT NOT NULL,
     type VARCHAR(20) DEFAULT 'normal', -- 'normal', 'delay', 'emergency'
+    expires_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
