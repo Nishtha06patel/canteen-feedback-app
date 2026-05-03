@@ -62,17 +62,9 @@ const StaffDashboard = () => {
                     <Bell size={20} color="var(--primary)" /> Recent Announcements (Last 24 Hours)
                 </div>
                 
-                {messages && messages.filter(msg => {
-                    const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
-                    const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
-                    return isRecent || (msg.expires_at && isNotExpired);
-                }).length > 0 ? (
+                {messages && messages.filter(msg => new Date(msg.expires_at) > new Date()).length > 0 ? (
                     <div className="no-scrollbar" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem' }}>
-                        {messages.filter(msg => {
-                            const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
-                            const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
-                            return isRecent || (msg.expires_at && isNotExpired);
-                        }).map(msg => (
+                        {messages.filter(msg => new Date(msg.expires_at) > new Date()).map(msg => (
                             <div key={msg.id} className="glass-card animate-pop-in" style={{ 
                                 minWidth: '300px', 
                                 maxWidth: '300px', 
@@ -94,7 +86,9 @@ const StaffDashboard = () => {
                                         {msg.type === 'emergency' ? <AlertTriangle size={12} /> : msg.type === 'delay' ? <Clock size={12} /> : <Bell size={12} />}
                                         {msg.type}
                                     </span>
-                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}</span>
+                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                                        Expires in {formatDistanceToNow(new Date(msg.expires_at))}
+                                    </span>
                                 </div>
                                 <p style={{ fontSize: '0.875rem', margin: 0, color: 'var(--text-main)', lineHeight: '1.5', fontWeight: '500' }}>{msg.content}</p>
                             </div>

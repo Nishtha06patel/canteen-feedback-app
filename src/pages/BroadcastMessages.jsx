@@ -22,13 +22,7 @@ const BroadcastMessages = () => {
 
         setIsSending(true);
         try {
-            let expiresAt = null;
-            if (expiryOption !== 'never') {
-                const hours = parseInt(expiryOption);
-                expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-            }
-
-            await sendBroadcastMessage(content, type, recipientRole, expiresAt);
+            await sendBroadcastMessage(content, type, recipientRole, expiryOption);
             setContent('');
             setType('normal');
         } catch (error) {
@@ -36,6 +30,14 @@ const BroadcastMessages = () => {
         } finally {
             setIsSending(false);
         }
+    };
+
+    const getRemainingTime = (expiryDate) => {
+        if (!expiryDate) return null;
+        const now = new Date();
+        const expiry = new Date(expiryDate);
+        if (expiry < now) return 'Expired';
+        return `Expires in ${formatDistanceToNow(expiry)}`;
     };
 
     const getTypeColor = (msgType) => {
@@ -120,22 +122,21 @@ const BroadcastMessages = () => {
                         </div>
                         
                         <div>
-                            <label className="input-label">Expiry Duration</label>
+                            <label className="input-label">Visibility Duration</label>
                             <select 
                                 className="input-field" 
                                 value={expiryOption} 
                                 onChange={(e) => setExpiryOption(e.target.value)}
                             >
-                                <option value="1">1 Hour (Quick Alert)</option>
-                                <option value="3">3 Hours</option>
-                                <option value="6">6 Hours</option>
+                                <option value="1">1 Hour</option>
+                                <option value="2">2 Hours</option>
+                                <option value="5">5 Hours</option>
                                 <option value="12">12 Hours</option>
                                 <option value="24">24 Hours (Standard)</option>
-                                <option value="48">48 Hours (Long Term)</option>
-                                <option value="never">No Expiry (Always show in 24h window)</option>
+                                <option value="48">48 Hours</option>
                             </select>
                             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-                                Messages expire automatically after this duration.
+                                Message will be visible for this time and then auto-disappear for users.
                             </div>
                         </div>
 
@@ -177,38 +178,45 @@ const BroadcastMessages = () => {
                 {/* Sent History Panel */}
                 <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Announcement History</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '500px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '600px', overflowY: 'auto', paddingRight: '0.5rem' }}>
                         {messages.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
                                 <MessageCircle size={40} style={{ opacity: 0.2, marginBottom: '1rem' }} />
                                 <p>No messages sent yet.</p>
                             </div>
                         ) : (
-                            messages.map((msg) => (
-                                <div key={msg.id} style={{ 
-                                    padding: '1rem', 
-                                    borderRadius: '12px', 
-                                    background: 'var(--bg-main)', 
-                                    border: `1px solid ${msg.type === 'emergency' ? '#fee2e2' : 'var(--border-light)'}`,
-                                    borderLeft: `4px solid ${getTypeColor(msg.type)}`
-                                }}>
-                                    <div className="flex-between" style={{ marginBottom: '0.5rem' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '700', color: getTypeColor(msg.type), textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                            {getTypeIcon(msg.type)} {msg.type}
-                                        </span>
-                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                            {format(new Date(msg.created_at), 'dd MMM, hh:mm a')}
-                                        </span>
+                            messages.map((msg) => {
+                                const remaining = getRemainingTime(msg.expires_at);
+                                const isExpired = remaining === 'Expired';
+                                
+                                return (
+                                    <div key={msg.id} style={{ 
+                                        padding: '1.25rem', 
+                                        borderRadius: '12px', 
+                                        background: isExpired ? 'rgba(0,0,0,0.02)' : 'var(--bg-main)', 
+                                        border: `1px solid ${isExpired ? 'var(--border-light)' : msg.type === 'emergency' ? '#fee2e2' : 'var(--border-light)'}`,
+                                        borderLeft: `4px solid ${isExpired ? '#94a3b8' : getTypeColor(msg.type)}`,
+                                        opacity: isExpired ? 0.7 : 1
+                                    }}>
+                                        <div className="flex-between" style={{ marginBottom: '0.75rem' }}>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: '800', color: isExpired ? '#64748b' : getTypeColor(msg.type), textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                {getTypeIcon(msg.type)} {msg.type}
+                                                {isExpired && <span style={{ marginLeft: '0.5rem', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '4px', fontSize: '0.6rem' }}>EXPIRED</span>}
+                                            </span>
+                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                                                {remaining}
+                                            </span>
+                                        </div>
+                                        <p style={{ fontSize: '0.95rem', color: 'var(--text-main)', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
+                                            {msg.content}
+                                        </p>
+                                        <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '0.5rem' }}>
+                                            <span>To: <strong style={{ textTransform: 'capitalize' }}>{msg.recipient_role === 'user' ? 'Students' : msg.recipient_role}</strong></span>
+                                            <span style={{ fontSize: '0.65rem' }}>{format(new Date(msg.created_at), 'MMM d, h:mm a')}</span>
+                                        </div>
                                     </div>
-                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', margin: 0, lineHeight: '1.4' }}>
-                                        {msg.content}
-                                    </p>
-                                    <div style={{ marginTop: '0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
-                                        <span>To: <strong style={{ textTransform: 'capitalize' }}>{msg.recipient_role === 'user' ? 'Students' : msg.recipient_role}</strong></span>
-                                        {currentUser?.role === 'admin' && <span>By: {msg.sender_email}</span>}
-                                    </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 </div>

@@ -2,52 +2,61 @@ import { query } from '../config/db.js';
 
 export const getMessages = async (req, res) => {
     try {
-        const { role } = req.user;
+        const { role, id } = req.user;
         const { all } = req.query;
         
-        // Filter: (No expiry AND created in last 24h) OR (Expiry exists AND not yet reached)
-        const filterClause = all === 'true' ? '1=1' : `
-            (expires_at IS NULL AND created_at >= NOW() - INTERVAL '24 hours') 
-            OR 
-            (expires_at IS NOT NULL AND expires_at > NOW())
-        `;
+        let queryStr;
+        let queryParams = [];
 
-        let result;
-        console.log(`Fetching messages for role: ${role}, user: ${req.user.id}`);
         if (role === 'admin') {
-            result = await query(`
+            // Admin sees everything
+            queryStr = `
                 SELECT m.id, m.content, m.type, m.created_at, m.expires_at, m.recipient_role, u.email as sender_email
                 FROM messages m
                 JOIN users u ON m.sender_id = u.id
-                WHERE ${filterClause}
                 ORDER BY m.created_at DESC
-            `);
+            `;
         } else {
-            result = await query(`
+            // Students and Staff see only active (non-expired) messages
+            // Staff see messages sent TO them or BY them
+            // Students see messages sent TO them
+            queryStr = `
                 SELECT m.id, m.content, m.type, m.created_at, m.expires_at, u.email as sender_email
                 FROM messages m
                 JOIN users u ON m.sender_id = u.id
-                WHERE (${filterClause}) AND (m.recipient_role = $1 OR m.sender_id = $2)
+                WHERE (m.expires_at > NOW()) 
+                AND (m.recipient_role = $1 OR m.sender_id = $2)
                 ORDER BY m.created_at DESC
-            `, [role, req.user.id]);
+            `;
+            queryParams = [role, id];
         }
+
+        console.log(`Fetching messages for role: ${role}, user: ${id}`);
+        const result = await query(queryStr, queryParams);
         console.log(`Found ${result.rows.length} messages`);
 
         res.json(result.rows);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching messages:', error);
         res.status(500).json({ message: 'Server error fetching messages' });
     }
 };
 
 export const sendMessage = async (req, res) => {
     try {
-        const { content, type, recipient_role, expiresAt } = req.body;
+        const { content, type, recipient_role, duration } = req.body;
         const sender_id = req.user.id;
 
         if (!content || !recipient_role) {
             return res.status(400).json({ message: 'Content and recipient role are required' });
         }
+
+        // Default duration 24 hours if not provided
+        const hoursToAdd = parseInt(duration) || 24;
+        
+        // Calculate expires_at
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + hoursToAdd);
 
         // Role-based validation
         if (req.user.role === 'staff' && !['admin', 'user'].includes(recipient_role)) {
@@ -56,7 +65,7 @@ export const sendMessage = async (req, res) => {
 
         const result = await query(
             'INSERT INTO messages (sender_id, recipient_role, content, type, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [sender_id, recipient_role, content, type || 'normal', expiresAt || null]
+            [sender_id, recipient_role, content, type || 'normal', expiresAt]
         );
 
         const newMessage = {

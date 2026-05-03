@@ -182,13 +182,13 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const sendBroadcastMessage = async (content, type, recipientRole, expiresAt) => {
+    const sendBroadcastMessage = async (content, type, recipientRole, duration) => {
         try {
             const { data } = await api.post('/messages', { 
                 content, 
                 type, 
                 recipient_role: recipientRole,
-                expiresAt 
+                duration 
             });
             // The socket emission is handled by backend, but we might want to update local state if we are the sender
             // But usually the backend emits to the sender's room too if they belong to it, or we manually add it.
