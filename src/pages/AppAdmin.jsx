@@ -49,52 +49,54 @@ const AppAdmin = () => {
 
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 {/* Admin List Panel */}
-                <div className="glass-card" style={{ flex: '1 1 500px', overflowX: 'auto', padding: '1.5rem' }}>
+                <div className="glass-card" style={{ flex: '1 1 500px', padding: '1.5rem' }}>
                     <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: 'var(--text-main)', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem', fontWeight: '700' }}>Current Admins</h2>
-                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)' }}>
-                                <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Email ID</th>
-                                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', fontSize: '0.85rem' }}>Role</th>
-                                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', fontSize: '0.85rem' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {admins.map((admin) => (
-                                <tr key={admin.email} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s', ':hover': { background: '#f8fafc' } }}>
-                                    <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>{admin.email}</td>
-                                    <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                        <span style={{ background: 'rgba(98, 54, 255, 0.1)', color: 'var(--primary)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '700' }}>
-                                            ADMIN
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                        <button 
-                                            onClick={() => handleDelete(admin.email)} 
-                                            className="btn" 
-                                            style={{ 
-                                                color: 'var(--danger)', 
-                                                background: 'rgba(239, 68, 68, 0.1)', 
-                                                padding: '0.4rem 0.75rem', 
-                                                fontSize: '0.85rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
-                                                margin: '0 auto',
-                                                border: 'none',
-                                                opacity: admins.length === 1 ? 0.5 : 1,
-                                                cursor: admins.length === 1 ? 'not-allowed' : 'pointer'
-                                            }}
-                                            disabled={admins.length === 1}
-                                            title={admins.length === 1 ? "Cannot delete the only remaining admin" : "Remove Admin"}
-                                        >
-                                            <Trash2 size={16} /> Remove
-                                        </button>
-                                    </td>
+                    <div className="responsive-table-container">
+                        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)' }}>
+                                    <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Email ID</th>
+                                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', fontSize: '0.85rem' }}>Role</th>
+                                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', fontSize: '0.85rem' }}>Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {admins.map((admin) => (
+                                    <tr key={admin.email} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }}>
+                                        <td data-label="Email ID" style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>{admin.email}</td>
+                                        <td data-label="Role" style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <span style={{ background: 'rgba(98, 54, 255, 0.1)', color: 'var(--primary)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '700' }}>
+                                                ADMIN
+                                            </span>
+                                        </td>
+                                        <td data-label="Actions" style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <button 
+                                                onClick={() => handleDelete(admin.email)} 
+                                                className="btn" 
+                                                style={{ 
+                                                    color: 'var(--danger)', 
+                                                    background: 'rgba(239, 68, 68, 0.1)', 
+                                                    padding: '0.4rem 0.75rem', 
+                                                    fontSize: '0.85rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem',
+                                                    margin: '0 auto',
+                                                    border: 'none',
+                                                    opacity: admins.length === 1 ? 0.5 : 1,
+                                                    cursor: admins.length === 1 ? 'not-allowed' : 'pointer'
+                                                }}
+                                                disabled={admins.length === 1}
+                                                title={admins.length === 1 ? "Cannot delete the only remaining admin" : "Remove Admin"}
+                                            >
+                                                <Trash2 size={16} /> Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {/* Add Admin Panel */}

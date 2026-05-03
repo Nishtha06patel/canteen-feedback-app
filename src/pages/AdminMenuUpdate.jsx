@@ -95,15 +95,15 @@ const AdminMenuUpdate = () => {
 
     const renderHeader = () => (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '0 1rem' }}>
-            <button onClick={prevMonth} className="btn btn-outline" style={{ padding: '0.4rem 1rem' }}>&larr; Prev</button>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>{format(currentMonth, 'MMMM yyyy')}</h2>
-            <button onClick={nextMonth} className="btn btn-outline" style={{ padding: '0.4rem 1rem' }}>Next &rarr;</button>
+            <button onClick={prevMonth} className="btn btn-outline calendar-nav-btn" style={{ padding: '0.4rem 1rem' }}>&larr; Prev</button>
+            <h2 className="calendar-month-title" style={{ fontSize: '1.5rem', fontWeight: '700', margin: 0 }}>{format(currentMonth, 'MMMM yyyy')}</h2>
+            <button onClick={nextMonth} className="btn btn-outline calendar-nav-btn" style={{ padding: '0.4rem 1rem' }}>Next &rarr;</button>
         </div>
     );
 
     const renderDays = () => {
         return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: '0.5rem' }}>
+            <div className="calendar-grid" style={{ marginBottom: '0.5rem' }}>
                 {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
                     <div key={d} style={{textAlign:'center', fontWeight:'700', color:'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase' }}>{d}</div>
                 ))}
@@ -120,7 +120,7 @@ const AdminMenuUpdate = () => {
         const days = eachDayOfInterval({ start: startDate, end: endDate });
 
         return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
+            <div className="calendar-grid">
                 {days.map(day => {
                     const isSelected = isSameDay(day, selectedDate);
                     const isCurrentMonth = isSameMonth(day, monthStart);
@@ -129,19 +129,14 @@ const AdminMenuUpdate = () => {
                         <div
                             key={day.toISOString()}
                             onClick={() => onDateClick(day)}
+                            className={`calendar-cell hover-grow ${isSelected ? 'selected' : ''}`}
                             style={{
-                                padding: '1rem',
-                                textAlign: 'center',
-                                cursor: 'pointer',
-                                borderRadius: '12px',
                                 background: isSelected ? 'var(--primary)' : (isCurrentMonth ? '#f8fafc' : 'transparent'),
                                 border: isSelected ? '1px solid var(--primary)' : '1px solid transparent',
                                 color: isSelected ? '#fff' : (isCurrentMonth ? 'var(--text-main)' : 'var(--text-muted)'),
-                                transition: 'all 0.2s',
                                 fontWeight: isSelected ? '700' : '500',
                                 boxShadow: isSelected ? '0 4px 12px rgba(98, 54, 255, 0.2)' : 'none'
                             }}
-                            className="hover-grow"
                         >
                             <span>{format(day, 'd')}</span>
                         </div>
@@ -272,7 +267,7 @@ const AdminMenuUpdate = () => {
                                     Menu for {format(selectedDate, 'eeee, MMMM do, yyyy')}
                                </h2>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', paddingBottom: '1rem' }}>
+                                <div className="responsive-modal-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', paddingBottom: '1rem' }}>
                                 {MEAL_BLOCKS.map(block => {
                                     const items = menuForSelectedDate[block.id] || [];
                                     const isEditing = editingBlock === block.id;
@@ -344,38 +339,40 @@ const AdminMenuUpdate = () => {
                         No PDFs uploaded yet. Upload a menu PDF using the button at the top.
                     </div>
                 ) : (
-                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border-light)' }}>
-                                <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>Date Uploaded</th>
-                                <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>File Name</th>
-                                <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>Data Extracted</th>
-                                <th style={{ padding: '1rem', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600' }}>Download</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {uploadHistory.map(record => (
-                                <tr key={record.id} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s', ':hover': { background: '#f8fafc' } }}>
-                                    <td style={{ padding: '1rem', fontSize: '0.9rem', fontWeight: '500' }}>{format(new Date(record.timestamp), 'dd MMM yyyy, HH:mm')}</td>
-                                    <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)', fontSize: '0.9rem' }}>{record.filename}</td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <span style={{ background: 'rgba(98, 54, 255, 0.1)', color: 'var(--primary)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600' }}>
-                                            {record.itemsParsed} items ({record.daysUpdated} days)
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                        <button 
-                                            onClick={() => handleDownloadIndividual(record)} 
-                                            className="btn btn-outline hover-grow" 
-                                            style={{ color: 'var(--primary)', borderColor: 'var(--primary)', padding: '0.3rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto', background: '#fff' }}
-                                        >
-                                            <Download size={14} /> File
-                                        </button>
-                                    </td>
+                    <div className="responsive-table-container">
+                        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border-light)' }}>
+                                    <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>Date Uploaded</th>
+                                    <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>File Name</th>
+                                    <th style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>Data Extracted</th>
+                                    <th style={{ padding: '1rem', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600' }}>Download</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {uploadHistory.map(record => (
+                                    <tr key={record.id} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }}>
+                                        <td data-label="Date Uploaded" style={{ padding: '1rem', fontSize: '0.9rem', fontWeight: '500' }}>{format(new Date(record.timestamp), 'dd MMM yyyy, HH:mm')}</td>
+                                        <td data-label="File Name" style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)', fontSize: '0.9rem' }}>{record.filename}</td>
+                                        <td data-label="Data Extracted" style={{ padding: '1rem' }}>
+                                            <span style={{ background: 'rgba(98, 54, 255, 0.1)', color: 'var(--primary)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600' }}>
+                                                {record.itemsParsed} items ({record.daysUpdated} days)
+                                            </span>
+                                        </td>
+                                        <td data-label="Download" style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <button 
+                                                onClick={() => handleDownloadIndividual(record)} 
+                                                className="btn btn-outline hover-grow" 
+                                                style={{ color: 'var(--primary)', borderColor: 'var(--primary)', padding: '0.3rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto', background: '#fff' }}
+                                            >
+                                                <Download size={14} /> File
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
         </div>

@@ -774,3 +774,50 @@ body {
     font-size: 0.75rem;
   }
 }
+
+/* ============================================================
+   CALENDAR & MODAL RESPONSIVENESS
+   ============================================================ */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.calendar-cell {
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    gap: 0.25rem;
+  }
+  
+  .calendar-cell {
+    padding: 0.6rem 0.2rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+  }
+
+  .calendar-month-title {
+    font-size: 1.1rem !important;
+  }
+
+  .calendar-nav-btn {
+    padding: 0.3rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Responsive Grid for Modal Blocks */
+  .responsive-modal-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
