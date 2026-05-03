@@ -49,26 +49,12 @@ const Login = () => {
     };
 
     return (
-        <div className="animate-fade-in" style={{ 
-            flex: 1, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            padding: '2rem',
+        <div className="auth-container animate-fade-in" style={{ 
             background: 'linear-gradient(var(--bg-overlay), var(--bg-overlay)), url("/campus-bg.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            minHeight: 'calc(100vh - 80px)',
-            padding: '1.5rem'
         }}>
-            <div className="glass-card auth-card animate-slide-up" style={{ 
-                width: '100%', 
-                padding: '2rem 1.5rem', 
-                textAlign: 'center',
-                background: 'var(--glass-bg)',
-                backdropFilter: 'blur(20px)',
-                borderRadius: '24px'
-            }}>
+            <div className="auth-card-wide animate-slide-up">
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
                     <div style={{ background: 'rgba(98, 54, 255, 0.1)', padding: '1rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <GraduationCap size={40} color="var(--primary)" />
@@ -80,8 +66,8 @@ const Login = () => {
                 </h1>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '0.95rem', fontWeight: '500' }}>Sign in to your account</p>
                 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div style={{ textAlign: 'left' }}>
+                <form onSubmit={handleLogin} className="form-grid">
+                    <div className="span-full" style={{ textAlign: 'left' }}>
                         <label className="input-label" style={{ fontWeight: '700' }}>Registered Email</label>
                         <div style={{ position: 'relative' }}>
                             <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', display: 'flex' }}>
@@ -99,7 +85,7 @@ const Login = () => {
                         </div>
                     </div>
                     
-                    <div style={{ textAlign: 'left' }}>
+                    <div className="span-full" style={{ textAlign: 'left' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', alignItems: 'center' }}>
                             <label className="input-label" style={{ marginBottom: 0, fontWeight: '700' }}>Password</label>
                             <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '700' }}>Forgot password?</Link>
@@ -127,7 +113,7 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <div style={{ textAlign: 'left' }}>
+                    <div className="span-full" style={{ textAlign: 'left' }}>
                         <label className="input-label" style={{ fontWeight: '700' }}>Role</label>
                         <div style={{ position: 'relative' }}>
                             <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', display: 'flex', pointerEvents: 'none' }}>
@@ -154,7 +140,7 @@ const Login = () => {
                     </div>
 
                     {role === 'admin' && (
-                        <div className="animate-fade-in" style={{ textAlign: 'left' }}>
+                        <div className="span-full animate-fade-in" style={{ textAlign: 'left' }}>
                             <label className="input-label" style={{ fontWeight: '700' }}>Admin Secret Code</label>
                             <div style={{ position: 'relative' }}>
                                 <input 
@@ -177,9 +163,9 @@ const Login = () => {
                         </div>
                     )}
 
-                    {error && <p className="animate-fade-in" style={{ color: 'var(--danger)', fontSize: '0.85rem', fontWeight: '600', marginTop: '-0.5rem' }}>{error}</p>}
+                    {error && <p className="span-full animate-fade-in" style={{ color: 'var(--danger)', fontSize: '0.85rem', fontWeight: '600', marginTop: '-0.5rem' }}>{error}</p>}
                     
-                    <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', padding: '1rem', fontSize: '1rem', borderRadius: '12px' }} disabled={isLoading}>
+                    <button type="submit" className="span-full btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', padding: '1rem', fontSize: '1rem', borderRadius: '12px' }} disabled={isLoading}>
                         {isLoading ? 'Logging In...' : 'Log In'}
                     </button>
                 </form>
