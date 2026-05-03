@@ -99,6 +99,14 @@ CREATE INDEX IF NOT EXISTS idx_feedbacks_user_id ON feedbacks(user_id);
 CREATE INDEX IF NOT EXISTS idx_menu_overrides_date ON menu_overrides(date);
 CREATE INDEX IF NOT EXISTS idx_messages_recipient ON messages(recipient_role);
 
+-- Safely add expires_at column to messages if it doesn't exist
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'messages' AND column_name = 'expires_at') THEN
+        ALTER TABLE messages ADD COLUMN expires_at TIMESTAMP WITH TIME ZONE;
+    END IF;
+END $$;
+
 -- Insert Default Admin (Password should be changed immediately!)
 -- The hash below corresponds to 'IARcanteen' using bcrypt (salt rounds: 10)
 INSERT INTO users (email, password_hash, role) 

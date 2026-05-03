@@ -57,6 +57,16 @@ const initDatabase = async () => {
             WHERE rating IS NULL OR feedback_type IS NULL;
         `).catch(err => console.log('Non-critical: Existing data migration skipped or failed (likely empty or non-JSON messages).'));
 
+        // Ensure expires_at column exists in messages
+        await pool.query(`
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'messages' AND column_name = 'expires_at') THEN
+                    ALTER TABLE messages ADD COLUMN expires_at TIMESTAMP WITH TIME ZONE;
+                END IF;
+            END $$;
+        `).catch(err => console.error('Failed to migrate expires_at column:', err));
+
     } catch (err) {
         console.error('Failed to initialize database schema:', err);
     }
