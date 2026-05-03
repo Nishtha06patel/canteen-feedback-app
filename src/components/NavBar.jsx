@@ -41,12 +41,13 @@ const NavBar = () => {
                 <img 
                     src="/iar-logo-full.png" 
                     alt="IAR University Logo" 
+                    className="logo-img"
                     style={{ height: '55px', width: 'auto', objectFit: 'contain' }} 
                 />
             </div>
 
-            {/* Center: App Title (Branded) */}
-            <div style={{
+            {/* Center: App Title (Hidden on Mobile) */}
+            <div className="nav-center-title" style={{
                 position: 'absolute',
                 left: '50%',
                 transform: 'translateX(-50%)',
@@ -71,7 +72,7 @@ const NavBar = () => {
             </div>
 
             {/* Right: Profile Menu */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div className="nav-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 {currentUser && (
                     <div style={{ position: 'relative' }} ref={dropdownRef}>
                         <button 
