@@ -24,148 +24,164 @@ const NavBar = () => {
     }, []);
 
     return (
-        <nav className="navbar-main">
-            <div className="nav-container-wrapper">
-                {/* Left: Logo */}
-                <div className="nav-left">
-                    <img 
-                        src="/iar-logo-full.png" 
-                        alt="IAR University" 
-                        className="full-logo logo-img"
-                        style={{ height: '55px', width: 'auto', objectFit: 'contain' }} 
-                    />
-                    <img 
-                        src="/logo.png" 
-                        alt="Logo" 
-                        className="mobile-logo logo-img"
-                        style={{ height: '32px', width: 'auto', objectFit: 'contain', display: 'none' }} 
-                    />
-                </div>
+        <nav style={{ 
+            padding: '0.75rem clamp(1rem, 5vw, 2rem)', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'var(--bg-card)',
+            borderBottom: '1px solid var(--border-light)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 1000,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        }}>
+            {/* Left: Branding & Title */}
+            <div className="nav-branding" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <img 
+                    src="/iar-logo-full.png" 
+                    alt="IAR University" 
+                    className="full-logo logo-img"
+                    style={{ height: '55px', width: 'auto', objectFit: 'contain' }} 
+                />
+                <img 
+                    src="/logo.png" 
+                    alt="Logo" 
+                    className="mobile-logo logo-img"
+                    style={{ height: '32px', width: 'auto', objectFit: 'contain', display: 'none' }} 
+                />
+                <h1 className="nav-title" style={{
+                    fontSize: 'clamp(0.9rem, 4vw, 1.35rem)',
+                    fontWeight: '800',
+                    margin: 0,
+                    letterSpacing: '0.5px',
+                    color: 'var(--primary)',
+                    fontFamily: "'Outfit', sans-serif",
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                }}>
+                    Canteen Feedback
+                </h1>
+            </div>
 
-                {/* Center: Title (Branding) */}
-                <div className="nav-center">
-                    <h1 className="nav-title">
-                        Canteen Feedback
-                    </h1>
-                </div>
+            {/* Right: Profile Menu */}
+            <div className="nav-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {currentUser && (
+                    <div style={{ position: 'relative' }} ref={dropdownRef}>
+                        <button 
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                background: 'transparent',
+                                border: '1px solid var(--border-light)',
+                                padding: '0.4rem 0.6rem',
+                                borderRadius: '30px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                            className="hover-grow"
+                        >
+                            <div style={{ 
+                                width: '32px', 
+                                height: '32px', 
+                                background: 'var(--primary)', 
+                                color: '#fff', 
+                                borderRadius: '50%', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                fontWeight: '700',
+                                fontSize: '0.9rem',
+                                boxShadow: '0 2px 5px rgba(98, 54, 255, 0.2)'
+                            }}>
+                                {userInitial}
+                            </div>
+                            <ChevronDown size={16} color="var(--text-muted)" style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                        </button>
 
-                {/* Right: Profile Menu */}
-                <div className="nav-right">
-                    {currentUser && (
-                        <div style={{ position: 'relative' }} ref={dropdownRef}>
-                            <button 
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    background: 'transparent',
-                                    border: '1px solid var(--border-light)',
-                                    padding: '0.4rem 0.6rem',
-                                    borderRadius: '30px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
-                                }}
-                                className="hover-grow"
-                            >
-                                <div style={{ 
-                                    width: '32px', 
-                                    height: '32px', 
-                                    background: 'var(--primary)', 
-                                    color: '#fff', 
-                                    borderRadius: '50%', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center',
-                                    fontWeight: '700',
-                                    fontSize: '0.9rem',
-                                    boxShadow: '0 2px 5px rgba(98, 54, 255, 0.2)'
-                                }}>
-                                    {userInitial}
-                                </div>
-                                <ChevronDown size={16} color="var(--text-muted)" style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-                            </button>
-
-                            {/* Dropdown Menu */}
-                            {isDropdownOpen && (
-                                <div className="animate-pop-in" style={{
-                                    position: 'absolute',
-                                    top: 'calc(100% + 10px)',
-                                    right: 0,
-                                    width: '220px',
-                                    background: 'var(--bg-card)',
-                                    border: '1px solid var(--border-light)',
-                                    borderRadius: '12px',
-                                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                                    padding: '0.75rem',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '0.25rem',
-                                    zIndex: 1001
-                                }}>
-                                    <div style={{ padding: '0.5rem', marginBottom: '0.5rem' }}>
-                                        <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)', wordBreak: 'break-all' }}>
-                                            {currentUser.username}
-                                        </div>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '0.2rem', fontWeight: '800' }}>
-                                            {currentUser.role}
-                                        </div>
+                        {/* Dropdown Menu */}
+                        {isDropdownOpen && (
+                            <div className="animate-pop-in" style={{
+                                position: 'absolute',
+                                top: 'calc(100% + 10px)',
+                                right: 0,
+                                width: '220px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-light)',
+                                borderRadius: '12px',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                                padding: '0.75rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.25rem',
+                                zIndex: 1001
+                            }}>
+                                <div style={{ padding: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)', wordBreak: 'break-all' }}>
+                                        {currentUser.username}
                                     </div>
-                                    
-                                    <div style={{ height: '1px', background: 'var(--border-light)', margin: '0.25rem 0' }}></div>
-                                    
-                                    <button 
-                                        onClick={() => { toggleTheme(); setIsDropdownOpen(false); }}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.75rem',
-                                            padding: '0.6rem 0.75rem',
-                                            width: '100%',
-                                            background: 'transparent',
-                                            border: 'none',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            color: 'var(--text-main)',
-                                            fontSize: '0.9rem',
-                                            textAlign: 'left',
-                                            transition: 'background 0.2s'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-main)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                        {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-                                        <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
-                                    </button>
-                                    
-                                    <button 
-                                        onClick={() => { logout(); setIsDropdownOpen(false); }}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.75rem',
-                                            padding: '0.6rem 0.75rem',
-                                            width: '100%',
-                                            background: 'transparent',
-                                            border: 'none',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            color: '#ef4444',
-                                            fontSize: '0.9rem',
-                                            textAlign: 'left',
-                                            transition: 'background 0.2s'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                        <LogOut size={16} />
-                                        <span>Logout</span>
-                                    </button>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '0.2rem', fontWeight: '800' }}>
+                                        {currentUser.role}
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    )}
-                </div>
+                                
+                                <div style={{ height: '1px', background: 'var(--border-light)', margin: '0.25rem 0' }}></div>
+                                
+                                <button 
+                                    onClick={() => { toggleTheme(); setIsDropdownOpen(false); }}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem',
+                                        padding: '0.6rem 0.75rem',
+                                        width: '100%',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        color: 'var(--text-main)',
+                                        fontSize: '0.9rem',
+                                        textAlign: 'left',
+                                        transition: 'background 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-main)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+                                    <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                                </button>
+                                
+                                <button 
+                                    onClick={() => { logout(); setIsDropdownOpen(false); }}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem',
+                                        padding: '0.6rem 0.75rem',
+                                        width: '100%',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        color: '#ef4444',
+                                        fontSize: '0.9rem',
+                                        textAlign: 'left',
+                                        transition: 'background 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    <LogOut size={16} />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </nav>
     );
