@@ -87,9 +87,8 @@ const Signup = () => {
             minHeight: 'calc(100vh - 80px)',
             padding: '1.5rem'
         }}>
-            <div className="glass-card animate-slide-up" style={{ 
+            <div className="glass-card auth-card animate-slide-up" style={{ 
                 width: '100%', 
-                maxWidth: '440px', 
                 padding: '3rem 2.5rem', 
                 textAlign: 'center',
                 background: 'var(--glass-bg)',

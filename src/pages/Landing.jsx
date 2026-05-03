@@ -4,8 +4,19 @@ import { Utensils, ArrowRight, ShieldCheck, Users } from 'lucide-react';
 
 const Landing = () => {
     return (
-        <div className="animate-fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <div className="animate-fade-in" style={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: 'clamp(2rem, 5vw, 4rem)',
+            background: 'linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url("/campus-bg.jpg")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            minHeight: 'calc(100vh - 80px)'
+        }}>
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem, 6vw, 4rem)', maxWidth: '800px' }}>
                 <div style={{ display: 'inline-flex', background: 'linear-gradient(135deg, var(--primary), var(--accent))', padding: '1.5rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 10px 25px rgba(99, 102, 241, 0.4)' }}>
                     <Utensils size={48} color="white" />
                 </div>

@@ -61,9 +61,8 @@ const Login = () => {
             minHeight: 'calc(100vh - 80px)',
             padding: '1.5rem'
         }}>
-            <div className="glass-card animate-slide-up" style={{ 
+            <div className="glass-card auth-card animate-slide-up" style={{ 
                 width: '100%', 
-                maxWidth: '420px', 
                 padding: '2rem 1.5rem', 
                 textAlign: 'center',
                 background: 'var(--glass-bg)',

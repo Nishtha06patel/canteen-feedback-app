@@ -64,7 +64,7 @@ const ForgotPassword = () => {
 
     return (
         <div className="animate-fade-in" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem', textAlign: 'center' }}>
+            <div className="glass-panel auth-card animate-slide-up" style={{ width: '100%', padding: '2.5rem', textAlign: 'center' }}>
                 
                 {step === 1 && (
                     <form onSubmit={handleSearchEmail} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
