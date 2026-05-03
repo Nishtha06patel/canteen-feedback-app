@@ -36,30 +36,25 @@ const NavBar = () => {
             zIndex: 1000,
             boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
         }}>
-            {/* Left: Branding Logo */}
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Left: Branding & Title */}
+            <div className="nav-branding" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <img 
                     src="/iar-logo-full.png" 
-                    alt="IAR University Logo" 
-                    className="logo-img"
+                    alt="IAR University" 
+                    className="full-logo logo-img"
                     style={{ height: '55px', width: 'auto', objectFit: 'contain' }} 
                 />
-            </div>
-
-            {/* Center: App Title (Hidden on Mobile) */}
-            <div className="nav-center-title" style={{
-                position: 'absolute',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                textAlign: 'center',
-                width: 'max-content',
-                maxWidth: '40vw'
-            }}>
-                <h1 style={{
-                    fontSize: 'clamp(1rem, 4vw, 1.5rem)',
+                <img 
+                    src="/logo.png" 
+                    alt="Logo" 
+                    className="mobile-logo logo-img"
+                    style={{ height: '32px', width: 'auto', objectFit: 'contain', display: 'none' }} 
+                />
+                <h1 className="nav-title" style={{
+                    fontSize: 'clamp(0.9rem, 4vw, 1.35rem)',
                     fontWeight: '800',
                     margin: 0,
-                    letterSpacing: '1px',
+                    letterSpacing: '0.5px',
                     color: 'var(--primary)',
                     fontFamily: "'Outfit', sans-serif",
                     textTransform: 'uppercase',

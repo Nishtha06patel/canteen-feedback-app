@@ -389,27 +389,51 @@ body {
     padding: 1rem;
   }
 
-  /* Header Mobile Optimization */
-  .hide-on-mobile {
-    display: none !important;
-  }
-  
-  .logo-img {
-    height: 40px !important;
-  }
-  
-  .nav-center-title {
-    display: none !important;
+  /* Header Desktop Styles */
+  .nav-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
-  /* Center everything on mobile nav if needed */
-  nav {
-    justify-content: center !important;
-  }
-  
-  .nav-right-actions {
-    position: absolute;
-    right: 1rem;
+  /* Header Mobile Optimization */
+  @media (max-width: 768px) {
+    nav {
+      justify-content: space-between !important;
+      padding: 0.75rem 0.75rem !important;
+      gap: 0.5rem;
+    }
+
+    .full-logo {
+      display: none !important;
+    }
+
+    .mobile-logo {
+      display: block !important;
+    }
+
+    .nav-branding {
+      gap: 0.4rem !important;
+      max-width: 75%;
+      overflow: hidden;
+      flex-shrink: 1;
+    }
+
+    .nav-title {
+      position: static !important;
+      transform: none !important;
+      font-size: 0.85rem !important;
+      letter-spacing: 0px !important;
+      max-width: calc(100% - 40px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .nav-right-actions {
+      position: static !important;
+      flex-shrink: 0;
+    }
   }
 }
 
