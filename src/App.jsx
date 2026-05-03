@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
 
@@ -33,14 +33,15 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
 const AppContent = () => {
     const { currentUser } = useAppContext();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const isStaffOrAdmin = currentUser?.role === 'admin' || currentUser?.role === 'staff';
 
     return (
         <Router>
             <div className="app-container">
-                <NavBar />
+                <NavBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} isSidebarOpen={sidebarOpen} />
                 <div className="main-content">
-                    {isStaffOrAdmin && <Sidebar />}
+                    {isStaffOrAdmin && <Sidebar isOpen={sidebarOpen} closeSidebar={() => setSidebarOpen(false)} />}
                     <main className="page-content">
                         <Routes>
                             <Route path="/" element={

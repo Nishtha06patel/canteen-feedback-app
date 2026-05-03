@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { LogOut, User, Sun, Moon, ChevronDown } from 'lucide-react';
+import { LogOut, User, Sun, Moon, ChevronDown, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
-const NavBar = () => {
+const NavBar = ({ toggleSidebar, isSidebarOpen }) => {
     const { currentUser, logout, theme, toggleTheme } = useAppContext();
     const location = useLocation();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
+    
+    const isStaffOrAdmin = currentUser?.role === 'admin' || currentUser?.role === 'staff';
 
     // Initial for avatar
     const userInitial = currentUser?.username ? currentUser.username.charAt(0).toUpperCase() : '?';
@@ -27,6 +29,11 @@ const NavBar = () => {
         <nav className="header-nav">
             {/* Left: Branding */}
             <div className="nav-section-left">
+                {isStaffOrAdmin && (
+                    <button className="mobile-menu-btn" onClick={toggleSidebar} aria-label="Toggle Menu">
+                        {isSidebarOpen ? <X size={22} /> : <Menu size={22} />}
+                    </button>
+                )}
                 <img 
                     src="/iar-logo-full.png" 
                     alt="IAR University" 

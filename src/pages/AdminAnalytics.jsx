@@ -131,7 +131,7 @@ const AdminAnalytics = () => {
                 />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div className="analytics-grid">
                 {/* Trend Chart */}
                 <div className="glass-card" style={{ padding: '1.5rem' }}>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -175,35 +175,36 @@ const AdminAnalytics = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
-                {/* Type Distribution */}
+            <div className="analytics-grid">
                 <div className="glass-card" style={{ padding: '1.5rem' }}>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '1.5rem' }}>Feedback Categories</h3>
-                    <div style={{ width: '100%', height: 300, display: 'flex', alignItems: 'center' }}>
-                        <ResponsiveContainer width="60%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={typeData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {typeData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div style={{ width: '40%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div className="pie-chart-container">
+                        <div className="pie-chart-main">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={typeData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {typeData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="pie-chart-legend">
                             {typeData.map((entry, index) => (
-                                <div key={entry.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: COLORS[index % COLORS.length] }}></div>
-                                    <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)' }}>{entry.name}</span>
-                                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>({entry.value})</span>
+                                <div key={entry.name} className="legend-item">
+                                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: COLORS[index % COLORS.length], flexShrink: 0 }}></div>
+                                    <span className="legend-text">{entry.name}</span>
+                                    <span className="legend-value">({entry.value})</span>
                                 </div>
                             ))}
                         </div>

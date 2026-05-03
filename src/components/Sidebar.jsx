@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { MessageSquare, Users, CalendarDays, Settings, BarChart, Bell } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, closeSidebar }) => {
     const location = useLocation();
     const { currentUser, messages } = useAppContext();
     const [unreadCount, setUnreadCount] = useState(0);
@@ -35,60 +35,60 @@ const Sidebar = () => {
     ].filter(item => !item.adminOnly || currentUser?.role === 'admin');
 
     return (
-        <aside className="sidebar" style={{
-            width: 'var(--sidebar-width)',
-            background: 'var(--bg-card)',
-            borderRight: '1px solid var(--border-light)',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '2rem 1.5rem',
-            height: '100%',
-            overflowY: 'auto'
-        }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {menuItems.map((item) => {
-                    const isActive = location.pathname === item.path;
-                    return (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1rem',
-                                padding: '1rem 1.25rem',
-                                borderRadius: '12px',
-                                textDecoration: 'none',
-                                color: isActive ? 'var(--primary)' : 'var(--text-main)',
-                                background: isActive ? 'rgba(98, 54, 255, 0.08)' : 'transparent',
-                                fontWeight: isActive ? '600' : '500',
-                                transition: 'all 0.2s ease',
-                                position: 'relative'
-                            }}
-                        >
-                            <div style={{ color: isActive ? 'var(--primary)' : 'var(--text-muted)' }}>
-                                {item.icon}
-                            </div>
-                            <span style={{ flex: 1 }}>{item.label}</span>
-                            {item.badge > 0 && !isActive && (
-                                <span style={{ 
-                                    background: 'var(--danger)', 
-                                    color: 'white', 
-                                    fontSize: '0.65rem', 
-                                    padding: '0.1rem 0.4rem', 
-                                    borderRadius: '10px',
-                                    fontWeight: '800',
-                                    minWidth: '18px',
-                                    textAlign: 'center'
-                                }}>
-                                    {item.badge}
-                                </span>
-                            )}
-                        </Link>
-                    );
-                })}
-            </div>
-        </aside>
+        <>
+            {/* Mobile Overlay */}
+            <div 
+                className={`sidebar-overlay ${isOpen ? 'visible' : ''}`} 
+                onClick={closeSidebar}
+            ></div>
+
+            <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {menuItems.map((item) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                onClick={() => { if (window.innerWidth <= 768) closeSidebar(); }}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '1rem',
+                                    padding: '1rem 1.25rem',
+                                    borderRadius: '12px',
+                                    textDecoration: 'none',
+                                    color: isActive ? 'var(--primary)' : 'var(--text-main)',
+                                    background: isActive ? 'rgba(98, 54, 255, 0.08)' : 'transparent',
+                                    fontWeight: isActive ? '600' : '500',
+                                    transition: 'all 0.2s ease',
+                                    position: 'relative'
+                                }}
+                            >
+                                <div style={{ color: isActive ? 'var(--primary)' : 'var(--text-muted)' }}>
+                                    {item.icon}
+                                </div>
+                                <span style={{ flex: 1 }}>{item.label}</span>
+                                {item.badge > 0 && !isActive && (
+                                    <span style={{ 
+                                        background: 'var(--danger)', 
+                                        color: 'white', 
+                                        fontSize: '0.65rem', 
+                                        padding: '0.1rem 0.4rem', 
+                                        borderRadius: '10px',
+                                        fontWeight: '800',
+                                        minWidth: '18px',
+                                        textAlign: 'center'
+                                    }}>
+                                        {item.badge}
+                                    </span>
+                                )}
+                            </Link>
+                        );
+                    })}
+                </div>
+            </aside>
+        </>
     );
 };
 

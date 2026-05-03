@@ -99,85 +99,87 @@ const AdminUsers = () => {
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 
                 {/* Users Directory List */}
-                <div className="glass-card" style={{ flex: '1 1 500px', overflowX: 'auto', padding: '1.5rem' }}>
+                <div className="glass-card" style={{ flex: '1 1 500px', padding: '1.5rem' }}>
                     <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: 'var(--text-main)', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem', fontWeight: '700' }}>
                         {showBlockedOnly ? 'Blocked Accounts' : 'Registered Users'}
                     </h2>
-                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)' }}>
-                                <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Email ID</th>
-                                <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Role</th>
-                                <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Status</th>
-                                {isAdmin && <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', fontSize: '0.85rem' }}>Actions</th>}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {displayedUsers.length === 0 && (
-                                <tr><td colSpan={isAdmin ? 4 : 3} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>{showBlockedOnly ? 'No users are currently blocked.' : 'No users currently registered.'}</td></tr>
-                            )}
-                            {displayedUsers.map((user) => {
-                                const stats = getUserStats(user.email);
-                                return (
-                                    <tr key={user.email} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }}>
-                                        <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>{user.email}</td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <span style={{ background: user.role === 'staff' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(98, 54, 255, 0.1)', color: user.role === 'staff' ? 'var(--warning)' : 'var(--primary)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '700', textTransform: 'uppercase' }}>
-                                                {user.role === 'staff' ? 'Staff' : 'Student'}
-                                            </span>
-                                        </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            {user.is_blocked ? (
-                                                <span style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase' }}>Blocked</span>
-                                            ) : (
-                                                <span style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase' }}>Active</span>
-                                            )}
-                                        </td>
-                                        {isAdmin && (
-                                            <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                                                    <button 
-                                                        onClick={() => handleBlockToggle(user.email, user.is_blocked)} 
-                                                        className="btn" 
-                                                        title={user.is_blocked ? 'Unblock User' : 'Block User'}
-                                                        style={{ 
-                                                            color: user.is_blocked ? 'var(--success)' : 'var(--warning)', 
-                                                            background: user.is_blocked ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                                            padding: '0.4rem 0.75rem', 
-                                                            fontSize: '0.85rem',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '0.5rem',
-                                                            border: 'none'
-                                                        }}
-                                                    >
-                                                        <Lock size={16} />
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => handleDelete(user.email)} 
-                                                        className="btn" 
-                                                        title="Permanently Delete"
-                                                        style={{ 
-                                                            color: 'var(--danger)', 
-                                                            background: 'rgba(239, 68, 68, 0.1)',
-                                                            padding: '0.4rem 0.75rem', 
-                                                            fontSize: '0.85rem',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '0.5rem',
-                                                            border: 'none'
-                                                        }}
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
+                    <div className="responsive-table-container">
+                        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)' }}>
+                                    <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Email ID</th>
+                                    <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Role</th>
+                                    <th style={{ padding: '1rem', fontWeight: '600', fontSize: '0.85rem' }}>Status</th>
+                                    {isAdmin && <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', fontSize: '0.85rem' }}>Actions</th>}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {displayedUsers.length === 0 && (
+                                    <tr><td colSpan={isAdmin ? 4 : 3} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>{showBlockedOnly ? 'No users are currently blocked.' : 'No users currently registered.'}</td></tr>
+                                )}
+                                {displayedUsers.map((user) => {
+                                    const stats = getUserStats(user.email);
+                                    return (
+                                        <tr key={user.email} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }}>
+                                            <td data-label="Email ID" style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>{user.email}</td>
+                                            <td data-label="Role" style={{ padding: '1rem' }}>
+                                                <span style={{ background: user.role === 'staff' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(98, 54, 255, 0.1)', color: user.role === 'staff' ? 'var(--warning)' : 'var(--primary)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '700', textTransform: 'uppercase' }}>
+                                                    {user.role === 'staff' ? 'Staff' : 'Student'}
+                                                </span>
                                             </td>
-                                        )}
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                            <td data-label="Status" style={{ padding: '1rem' }}>
+                                                {user.is_blocked ? (
+                                                    <span style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase' }}>Blocked</span>
+                                                ) : (
+                                                    <span style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase' }}>Active</span>
+                                                )}
+                                            </td>
+                                            {isAdmin && (
+                                                <td data-label="Actions" style={{ padding: '1rem', textAlign: 'center' }}>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                                        <button 
+                                                            onClick={() => handleBlockToggle(user.email, user.is_blocked)} 
+                                                            className="btn" 
+                                                            title={user.is_blocked ? 'Unblock User' : 'Block User'}
+                                                            style={{ 
+                                                                color: user.is_blocked ? 'var(--success)' : 'var(--warning)', 
+                                                                background: user.is_blocked ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                                padding: '0.4rem 0.75rem', 
+                                                                fontSize: '0.85rem',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '0.5rem',
+                                                                border: 'none'
+                                                            }}
+                                                        >
+                                                            <Lock size={16} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleDelete(user.email)} 
+                                                            className="btn" 
+                                                            title="Permanently Delete"
+                                                            style={{ 
+                                                                color: 'var(--danger)', 
+                                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                                padding: '0.4rem 0.75rem', 
+                                                                fontSize: '0.85rem',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '0.5rem',
+                                                                border: 'none'
+                                                            }}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {/* Add New User Panel - Only for Admin */}
