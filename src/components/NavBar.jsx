@@ -20,16 +20,12 @@ const NavBar = () => {
             top: 0,
             zIndex: 100
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
                 <img 
-                    src="/logo.jpg" 
-                    alt="IAR Logo" 
-                    style={{ height: '45px', width: 'auto', objectFit: 'contain' }} 
+                    src="/iar-logo-full.png" 
+                    alt="IAR University Logo" 
+                    style={{ height: '65px', width: 'auto', objectFit: 'contain' }} 
                 />
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <h2 style={{ fontSize: '1.35rem', fontWeight: '500', color: '#7a003c', margin: 0, letterSpacing: '0.5px', fontFamily: 'Georgia, serif' }}>Institute of Advanced Research</h2>
-                    <p style={{ fontSize: '0.9rem', color: '#b30059', margin: 0, fontStyle: 'italic', fontWeight: '600', fontFamily: 'Georgia, serif' }}>The University for Innovation</p>
-                </div>
             </div>
 
             {/* Center: App Title */}
