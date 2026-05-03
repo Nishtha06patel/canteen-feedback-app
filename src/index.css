@@ -400,8 +400,8 @@ body {
   @media (max-width: 768px) {
     nav {
       justify-content: space-between !important;
-      padding: 0.75rem 0.75rem !important;
-      gap: 0.5rem;
+      padding: 0.75rem 1rem !important;
+      gap: 1rem;
     }
 
     .full-logo {
@@ -413,21 +413,21 @@ body {
     }
 
     .nav-branding {
-      gap: 0.4rem !important;
-      max-width: 75%;
+      gap: 0.6rem !important;
+      flex: 1;
+      min-width: 0;
       overflow: hidden;
-      flex-shrink: 1;
     }
 
     .nav-title {
       position: static !important;
       transform: none !important;
-      font-size: 0.85rem !important;
-      letter-spacing: 0px !important;
-      max-width: calc(100% - 40px);
+      font-size: 0.95rem !important;
+      letter-spacing: 0.2px !important;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      color: var(--primary);
     }
     
     .nav-right-actions {
