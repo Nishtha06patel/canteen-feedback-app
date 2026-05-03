@@ -103,3 +103,18 @@ CREATE INDEX IF NOT EXISTS idx_messages_recipient ON messages(recipient_role);
 INSERT INTO users (email, password_hash, role) 
 VALUES ('admin@iar.ac.in', '$2b$10$pd/4yXaa7lLJuxKmJwz8lugqlyKITpHQ00M/BIS2U1hGF6HBcZ5v2', 'admin')
 ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash;
+
+-- Meals Table (Lunch & Dinner Tracking)
+CREATE TABLE IF NOT EXISTS meals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    lunch BOOLEAN DEFAULT false,
+    dinner BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, date)
+);
+
+-- Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_meals_date ON meals(date);
+CREATE INDEX IF NOT EXISTS idx_meals_user_date ON meals(user_id, date);

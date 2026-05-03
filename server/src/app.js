@@ -12,6 +12,7 @@ import userRoutes from './routes/userRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import menuRoutes from './routes/menuRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
+import mealRoutes from './routes/mealRoutes.js';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/meal', mealRoutes);
 
 // Socket.io Connection & Auth
 io.use((socket, next) => {

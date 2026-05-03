@@ -1,17 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import api from '../utils/api';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
 } from 'recharts';
-import { TrendingUp, Star, AlertCircle, ThumbsUp, MessageSquare, List } from 'lucide-react';
+import { TrendingUp, Star, AlertCircle, ThumbsUp, MessageSquare, List, Utensils, Moon, Sun } from 'lucide-react';
 
 const AdminAnalytics = () => {
     const { feedbackStats, fetchStats } = useAppContext();
+    const [mealSummary, setMealSummary] = useState({ dinnerToday: 0, lunchTomorrow: 0 });
 
     useEffect(() => {
         fetchStats();
+        fetchMealSummary();
     }, []);
+
+    const fetchMealSummary = async () => {
+        try {
+            const res = await api.get('/meal/summary');
+            setMealSummary(res.data);
+        } catch (error) {
+            console.error('Error fetching meal summary:', error);
+        }
+    };
 
     if (!feedbackStats) {
         return (
@@ -64,6 +76,32 @@ const AdminAnalytics = () => {
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '3rem' }}>
             <h1 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '2rem' }}>Statistical Report</h1>
+
+            {/* Meal Selection Summary Row */}
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+                <div className="glass-card animate-slide-up" style={{ padding: '1.5rem', flex: 1, minWidth: '300px', border: '1.5px solid var(--primary-light)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <p style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Students for Dinner Today</p>
+                            <h3 style={{ fontSize: '2rem', fontWeight: '800', margin: 0, color: '#334155' }}>{mealSummary.dinnerToday}</h3>
+                        </div>
+                        <div style={{ background: 'rgba(51, 65, 85, 0.1)', color: '#334155', padding: '1rem', borderRadius: '15px' }}>
+                            <Moon size={32} />
+                        </div>
+                    </div>
+                </div>
+                <div className="glass-card animate-slide-up" style={{ padding: '1.5rem', flex: 1, minWidth: '300px', border: '1.5px solid var(--primary-light)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <p style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Students for Lunch Tomorrow</p>
+                            <h3 style={{ fontSize: '2rem', fontWeight: '800', margin: 0, color: '#f59e0b' }}>{mealSummary.lunchTomorrow}</h3>
+                        </div>
+                        <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', padding: '1rem', borderRadius: '15px' }}>
+                            <Sun size={32} />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Summary Row */}
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>

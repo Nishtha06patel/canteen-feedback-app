@@ -4,6 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { Camera, Paperclip, X, Image as ImageIcon, Utensils, Sun, Moon, ArrowLeft, Star, Clock, Bell, AlertTriangle } from 'lucide-react';
 import { fileToBase64 } from '../utils/db';
+import MealSelection from '../components/MealSelection';
 
 const UserDashboard = () => {
     const { addFeedback, getMenuForDate, messages } = useAppContext();
@@ -332,6 +333,9 @@ const UserDashboard = () => {
                     </div>
                 </div>
             )}
+
+            {/* Meal Selection Feature */}
+            <MealSelection />
 
             {/* Top Day Selector Navbar (Styled as clean pills) */}
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
