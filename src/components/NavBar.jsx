@@ -24,50 +24,30 @@ const NavBar = () => {
     }, []);
 
     return (
-        <nav style={{ 
-            padding: '0.75rem clamp(1rem, 5vw, 2rem)', 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            background: 'var(--bg-card)',
-            borderBottom: '1px solid var(--border-light)',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1000,
-            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
-        }}>
-            {/* Left: Branding & Title */}
-            <div className="nav-branding" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        <nav className="header-nav">
+            {/* Left: Branding */}
+            <div className="nav-section-left">
                 <img 
                     src="/iar-logo-full.png" 
                     alt="IAR University" 
                     className="full-logo logo-img"
-                    style={{ height: '55px', width: 'auto', objectFit: 'contain' }} 
                 />
                 <img 
                     src="/logo.png" 
                     alt="Logo" 
                     className="mobile-logo logo-img"
-                    style={{ height: '32px', width: 'auto', objectFit: 'contain', display: 'none' }} 
                 />
-                <h1 className="nav-title" style={{
-                    fontSize: 'clamp(0.9rem, 4vw, 1.35rem)',
-                    fontWeight: '800',
-                    margin: 0,
-                    letterSpacing: '0.5px',
-                    color: 'var(--primary)',
-                    fontFamily: "'Outfit', sans-serif",
-                    textTransform: 'uppercase',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                }}>
+            </div>
+
+            {/* Center: Title */}
+            <div className="nav-section-center">
+                <h1 className="nav-title">
                     Canteen Feedback
                 </h1>
             </div>
 
             {/* Right: Profile Menu */}
-            <div className="nav-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div className="nav-section-right">
                 {currentUser && (
                     <div style={{ position: 'relative' }} ref={dropdownRef}>
                         <button 
