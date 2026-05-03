@@ -307,7 +307,7 @@ const UserDashboard = () => {
                     const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
                     return isRecent || (msg.expires_at && isNotExpired);
                 }).length > 0 ? (
-                    <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
+                    <div className="no-scrollbar" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem' }}>
                         {messages.filter(msg => {
                             const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
                             const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();

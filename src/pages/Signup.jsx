@@ -84,7 +84,8 @@ const Signup = () => {
             background: 'linear-gradient(var(--bg-overlay), var(--bg-overlay)), url("/campus-bg.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            minHeight: 'calc(100vh - 73px)'
+            minHeight: 'calc(100vh - 80px)',
+            padding: '1.5rem'
         }}>
             <div className="glass-card animate-slide-up" style={{ 
                 width: '100%', 
@@ -143,7 +144,7 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                         <div style={{ textAlign: 'left' }}>
                             <label className="input-label" style={{ fontWeight: '700' }}>Password</label>
                             <div style={{ position: 'relative' }}>

@@ -61,7 +61,7 @@ const BroadcastMessages = () => {
                 <h1 style={{ fontSize: '1.75rem', fontWeight: '700', margin: 0 }}>Announcements</h1>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+            <div className="responsive-grid">
                 {/* Message Creation Panel */}
                 <div className="glass-card" style={{ padding: '2rem', height: 'fit-content' }}>
                     <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontWeight: '700' }}>New Broadcast</h2>

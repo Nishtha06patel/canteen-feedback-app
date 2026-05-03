@@ -35,7 +35,7 @@ const Sidebar = () => {
     ].filter(item => !item.adminOnly || currentUser?.role === 'admin');
 
     return (
-        <aside style={{
+        <aside className="sidebar" style={{
             width: 'var(--sidebar-width)',
             background: 'var(--bg-card)',
             borderRight: '1px solid var(--border-light)',

@@ -58,12 +58,13 @@ const Login = () => {
             background: 'linear-gradient(var(--bg-overlay), var(--bg-overlay)), url("/campus-bg.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            minHeight: 'calc(100vh - 73px)'
+            minHeight: 'calc(100vh - 80px)',
+            padding: '1.5rem'
         }}>
             <div className="glass-card animate-slide-up" style={{ 
                 width: '100%', 
                 maxWidth: '420px', 
-                padding: '3rem 2.5rem', 
+                padding: '2rem 1.5rem', 
                 textAlign: 'center',
                 background: 'var(--glass-bg)',
                 backdropFilter: 'blur(20px)',

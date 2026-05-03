@@ -199,7 +199,7 @@ const AdminDashboard = () => {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {filteredFeedbacks.map((fb) => (
-                        <div key={fb.id} className="glass-card animate-slide-up" style={{ padding: '1.5rem', display: 'flex', gap: '1.5rem' }}>
+                        <div key={fb.id} className="glass-card animate-slide-up" style={{ padding: '1.5rem', display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
                             {/* Avatar */}
                             <div style={{ 
                                 width: '48px', 

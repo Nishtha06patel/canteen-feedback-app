@@ -25,7 +25,7 @@ const NavBar = () => {
 
     return (
         <nav style={{ 
-            padding: '0.75rem 2rem', 
+            padding: '0.75rem clamp(1rem, 5vw, 2rem)', 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
@@ -50,16 +50,21 @@ const NavBar = () => {
                 position: 'absolute',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                textAlign: 'center'
+                textAlign: 'center',
+                width: 'max-content',
+                maxWidth: '40vw'
             }}>
                 <h1 style={{
-                    fontSize: '1.5rem',
+                    fontSize: 'clamp(1rem, 4vw, 1.5rem)',
                     fontWeight: '800',
                     margin: 0,
-                    letterSpacing: '1.5px',
+                    letterSpacing: '1px',
                     color: 'var(--primary)',
                     fontFamily: "'Outfit', sans-serif",
-                    textTransform: 'uppercase'
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                 }}>
                     Canteen Feedback
                 </h1>
