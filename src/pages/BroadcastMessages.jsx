@@ -58,7 +58,7 @@ const BroadcastMessages = () => {
 
     return (
         <div className="animate-fade-in" style={{ display: 'flex', gap: '2rem', flexDirection: 'column', maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <div className="announcement-header-section" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                 <MessageCircle size={28} color="var(--primary)" />
                 <h1 style={{ fontSize: '1.75rem', fontWeight: '700', margin: 0 }}>Announcements</h1>
             </div>
@@ -91,12 +91,13 @@ const BroadcastMessages = () => {
 
                         <div>
                             <label className="input-label">Message Priority</label>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <div className="priority-btn-group" style={{ display: 'flex', gap: '0.5rem' }}>
                                 {['normal', 'delay', 'emergency'].map((t) => (
                                     <button
                                         key={t}
                                         type="button"
                                         onClick={() => setType(t)}
+                                        className="priority-btn"
                                         style={{
                                             flex: 1,
                                             padding: '0.6rem',
@@ -190,7 +191,7 @@ const BroadcastMessages = () => {
                                 const isExpired = remaining === 'Expired';
                                 
                                 return (
-                                    <div key={msg.id} style={{ 
+                                    <div key={msg.id} className="announcement-item" style={{ 
                                         padding: '1.25rem', 
                                         borderRadius: '12px', 
                                         background: isExpired ? 'rgba(0,0,0,0.02)' : 'var(--bg-main)', 
@@ -198,10 +199,10 @@ const BroadcastMessages = () => {
                                         borderLeft: `4px solid ${isExpired ? '#94a3b8' : getTypeColor(msg.type)}`,
                                         opacity: isExpired ? 0.7 : 1
                                     }}>
-                                        <div className="flex-between" style={{ marginBottom: '0.75rem' }}>
+                                        <div className="announcement-item-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                                             <span style={{ fontSize: '0.75rem', fontWeight: '800', color: isExpired ? '#64748b' : getTypeColor(msg.type), textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                                 {getTypeIcon(msg.type)} {msg.type}
-                                                {isExpired && <span style={{ marginLeft: '0.5rem', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '4px', fontSize: '0.6rem' }}>EXPIRED</span>}
+                                                {isExpired && <span style={{ background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '4px', fontSize: '0.6rem' }}>EXPIRED</span>}
                                             </span>
                                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
                                                 {remaining}
@@ -210,7 +211,7 @@ const BroadcastMessages = () => {
                                         <p style={{ fontSize: '0.95rem', color: 'var(--text-main)', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
                                             {msg.content}
                                         </p>
-                                        <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '0.5rem' }}>
+                                        <div className="announcement-item-footer" style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '0.5rem' }}>
                                             <span>To: <strong style={{ textTransform: 'capitalize' }}>{msg.recipient_role === 'user' ? 'Students' : msg.recipient_role}</strong></span>
                                             <span style={{ fontSize: '0.65rem' }}>{format(new Date(msg.created_at), 'MMM d, h:mm a')}</span>
                                         </div>

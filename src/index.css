@@ -821,3 +821,34 @@ body {
     gap: 1rem !important;
   }
 }
+
+/* ============================================================
+   ANNOUNCEMENT PAGE RESPONSIVENESS
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .priority-btn-group {
+    flex-direction: column !important;
+    gap: 0.6rem !important;
+  }
+
+  .priority-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.75rem !important;
+  }
+
+  .announcement-item {
+    padding: 1rem !important;
+  }
+
+  .announcement-item-header {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .announcement-item-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
