@@ -3,15 +3,17 @@ import { query } from '../config/db.js';
 export const getMessages = async (req, res) => {
     try {
         const { role } = req.user;
+        const { all } = req.query;
         
         // Filter: (No expiry AND created in last 24h) OR (Expiry exists AND not yet reached)
-        const filterClause = `
+        const filterClause = all === 'true' ? '1=1' : `
             (expires_at IS NULL AND created_at >= NOW() - INTERVAL '24 hours') 
             OR 
             (expires_at IS NOT NULL AND expires_at > NOW())
         `;
 
         let result;
+        console.log(`Fetching messages for role: ${role}, user: ${req.user.id}`);
         if (role === 'admin') {
             result = await query(`
                 SELECT m.id, m.content, m.type, m.created_at, m.expires_at, m.recipient_role, u.email as sender_email
@@ -29,6 +31,7 @@ export const getMessages = async (req, res) => {
                 ORDER BY m.created_at DESC
             `, [role, req.user.id]);
         }
+        console.log(`Found ${result.rows.length} messages`);
 
         res.json(result.rows);
     } catch (error) {

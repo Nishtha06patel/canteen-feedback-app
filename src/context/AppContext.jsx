@@ -50,6 +50,7 @@ export const AppProvider = ({ children }) => {
             });
 
             newSocket.on('newMessage', (msg) => {
+                console.log('Real-time announcement received:', msg);
                 setMessages(prev => [msg, ...prev]);
                 // Highlight or sound alert if needed
                 if (msg.type === 'emergency') {
@@ -61,6 +62,7 @@ export const AppProvider = ({ children }) => {
             fetchMessages();
 
             return () => {
+                console.log('Disconnecting socket');
                 newSocket.disconnect();
             };
         }
@@ -168,10 +170,12 @@ export const AppProvider = ({ children }) => {
         setCurrentUser(null);
     };
 
-    const fetchMessages = async () => {
+    const fetchMessages = async (all = false) => {
         if (!currentUser) return;
         try {
-            const { data } = await api.get('/messages');
+            console.log(`Fetching announcements from API (all=${all})...`);
+            const { data } = await api.get(`/messages${all ? '?all=true' : ''}`);
+            console.log('Announcements fetched:', data);
             setMessages(data);
         } catch (error) {
             console.error("Failed to fetch messages", error);

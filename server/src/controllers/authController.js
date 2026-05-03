@@ -2,9 +2,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { query } from '../config/db.js';
 
-const generateToken = (id) => {
+const generateToken = (id, role) => {
     const secret = process.env.JWT_SECRET || 'fallback_super_secret_key_change_in_production';
-    return jwt.sign({ id }, secret, {
+    return jwt.sign({ id, role }, secret, {
         expiresIn: '30d',
     });
 };
@@ -70,7 +70,7 @@ export const register = async (req, res) => {
             id: user.id,
             email: user.email,
             role: user.role,
-            token: generateToken(user.id)
+            token: generateToken(user.id, user.role)
         });
     } catch (error) {
         console.error(error);
@@ -124,7 +124,7 @@ export const login = async (req, res) => {
             id: user.id,
             email: user.email,
             role: user.role,
-            token: generateToken(user.id)
+            token: generateToken(user.id, user.role)
         });
     } catch (error) {
         console.error(error);

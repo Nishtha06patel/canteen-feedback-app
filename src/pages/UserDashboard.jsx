@@ -297,22 +297,23 @@ const UserDashboard = () => {
             </div>
 
             {/* Announcements Section */}
-            {messages.filter(msg => {
-                const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
-                const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
-                return isRecent || (msg.expires_at && isNotExpired);
-            }).length > 0 && (
-                <div style={{ marginBottom: '2.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700' }}>
-                        <Bell size={20} color="var(--primary)" /> Recent Announcements (Last 24 Hours)
-                    </div>
+            <div style={{ marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700' }}>
+                    <Bell size={20} color="var(--primary)" /> Recent Announcements (Last 24 Hours)
+                </div>
+                
+                {messages && messages.filter(msg => {
+                    const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+                    const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
+                    return isRecent || (msg.expires_at && isNotExpired);
+                }).length > 0 ? (
                     <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
                         {messages.filter(msg => {
                             const isRecent = new Date(msg.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000);
                             const isNotExpired = !msg.expires_at || new Date(msg.expires_at) > new Date();
                             return isRecent || (msg.expires_at && isNotExpired);
                         }).map(msg => (
-                            <div key={msg.id} className="glass-card" style={{ 
+                            <div key={msg.id} className="glass-card animate-pop-in" style={{ 
                                 minWidth: '300px', 
                                 maxWidth: '300px', 
                                 padding: '1.25rem', 
@@ -339,8 +340,12 @@ const UserDashboard = () => {
                             </div>
                         ))}
                     </div>
-                </div>
-            )}
+                ) : (
+                    <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        No recent announcements at this time.
+                    </div>
+                )}
+            </div>
 
             {/* Meal Selection Feature */}
             <MealSelection />

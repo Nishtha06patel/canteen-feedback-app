@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Send, Bell, AlertTriangle, Clock, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 const BroadcastMessages = () => {
-    const { currentUser, messages, sendBroadcastMessage } = useAppContext();
+    const { currentUser, messages, sendBroadcastMessage, fetchMessages } = useAppContext();
+
+    useEffect(() => {
+        fetchMessages(true);
+    }, []);
+
     const [content, setContent] = useState('');
     const [type, setType] = useState('normal');
     const [recipientRole, setRecipientRole] = useState(currentUser?.role === 'admin' ? 'staff' : 'admin');
